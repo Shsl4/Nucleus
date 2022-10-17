@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMacros.h"
+#include <typeinfo>
+#include <iostream>
 
 namespace TinyCore {
 
@@ -16,19 +18,14 @@ class AllocationObserver {
 		friend class Allocator;
 
 		template<typename T>
-		static void statAlloc(size_t size){
-
-			allocSize += sizeof(T) * size;
-			++allocCount;
-
-		}
+		static void statAlloc(size_t size);
 
 		template<typename T>
 		static void statRelease() {
 			++releaseCount;
 		}
 
-		static void info();
+		static void info() noexcept;
 
 		static size_t allocSize;
 		static size_t allocCount;
@@ -37,3 +34,7 @@ class AllocationObserver {
 	};
 
 }
+
+#define OBSERVER_INLINE
+#include "Inline/AllocationObserver.inl"
+#undef OBSERVER_INLINE
