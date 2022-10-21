@@ -36,3 +36,6 @@
 /x64
 /TinyCore/x64
 *.DS_Store
+/.cmake
+*.lnk
+/Build
