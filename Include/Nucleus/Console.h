@@ -9,9 +9,6 @@
 
 #endif
 
-#include <fcntl.h>
-#include <io.h>
-
 namespace Nucleus {
     
     class Console {
@@ -60,7 +57,6 @@ namespace Nucleus {
             const auto size = static_cast<DWORD>(string.getSize());
             WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), string.begin(), size, nullptr, nullptr);
 #else
-            _setmode(_fileno(file), _O_U16TEXT);
             fwrite(string.begin(), sizeof(wchar_t), string.getSize() + 1, file);
             fflush(stdout);
 #endif
