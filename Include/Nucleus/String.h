@@ -92,7 +92,7 @@ namespace Nucleus {
             return c >= L'0' && c <= L'9';
         }
         
-        FORCEINLINE static UInt8 wcharToInteger(const wchar_t c) {
+        FORCEINLINE static UInt16 wcharToInteger(const wchar_t c) {
             return c - L'0';
         }
         

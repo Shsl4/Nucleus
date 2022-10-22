@@ -39,7 +39,7 @@ namespace Nucleus {
                 throw Exceptions::ParseError("Failed to parse: String does not represent a number.");
             }
             
-            const UInt8 digit = wcharToInteger(buffer[i]);
+            const UInt16 digit = wcharToInteger(buffer[i]);
             
             if(i < dotIndex){
                 value += digit * std::pow(10, dotIndex - i - 1);

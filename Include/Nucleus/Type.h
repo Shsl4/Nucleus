@@ -20,13 +20,13 @@ namespace Nucleus {
         template<typename T>
         static String getClassName();
 
-    private:
+#ifdef __GNUG__
 
-    #ifdef __GNUG__
+    private:
 
         inline static String demangle(const char* name);
 
-    #endif
+#endif
 
     };
 
