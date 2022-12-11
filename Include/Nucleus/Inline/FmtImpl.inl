@@ -2,7 +2,8 @@
 
 #ifdef FMT_INLINE
 
-#include <Nucleus/Nucleus.h>
+#include <Nucleus/Unique.h>
+#include <Nucleus/Shared.h>
 
 namespace Nucleus {
 
@@ -103,29 +104,6 @@ namespace Nucleus {
 
     };
 
-    template<>
-    class Fmt<const wchar_t*> {
-
-    public:
-
-        static String format(const wchar_t* elem) {
-            return elem;
-        }
-
-
-    };
-
-    template<size_t n>
-    class Fmt<wchar_t[n]> {
-
-    public:
-
-        static String format(const wchar_t elem[n]) {
-            return elem;
-        }
-
-    };
-
     template<typename T>
     class Fmt<Shared<T>> {
 
@@ -155,6 +133,17 @@ namespace Nucleus {
 
         static String format(Unique<T> const& elem) {
             return elem.isValid() ? Fmt<T>::format(*elem) : "empty";
+        }
+
+    };
+
+    template<>
+    class Fmt<std::type_info> {
+
+    public:
+
+        static String format(std::type_info const& type) {
+            return Type::name(type);
         }
 
     };

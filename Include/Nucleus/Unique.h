@@ -46,6 +46,10 @@ namespace Nucleus {
         
         T* operator->() const;
         
+        FORCEINLINE T* pointer() { assertValid(); return object; }
+                
+        FORCEINLINE T* pointer() const { assertValid(); return object; }
+        
         String getClass() const;
 
         FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
@@ -63,5 +67,5 @@ namespace Nucleus {
 }
 
 #define UNIQUE_INLINE
-#include "Inline/Unique.inl"
+#include <Nucleus/Inline/Unique.inl>
 #undef UNIQUE_INLINE

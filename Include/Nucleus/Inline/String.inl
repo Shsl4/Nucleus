@@ -6,6 +6,22 @@
 #include <sstream>
 
 namespace Nucleus {
+
+    inline void ensure(bool condition, class String const& str){
+
+        if(!condition){
+            throw Exceptions::Exception(str.begin());
+        }
+
+    }
+
+    inline void ensure(bool condition){
+
+        if(!condition){
+            throw Exceptions::Exception("Unhandled exception.");
+        }
+
+    }
     
     inline String::String(String const& other){
         *this = other;
@@ -20,20 +36,29 @@ namespace Nucleus {
         reserve(cap);
         
     }
-
+    
     inline String::String(const char* cString) {
 
         if (!cString) { return; }
 
         const size_t stringSize = strlen(cString) + 1;
-        this->buffer = Allocator<wchar_t>::allocate(stringSize);
+        this->buffer = Allocator<char>::allocate(stringSize);
 
-#ifdef _WIN32
-        mbstowcs_s(nullptr, buffer, stringSize, cString, stringSize);
-#else
-        mbstowcs(buffer, cString, stringSize);
-#endif
+        Allocator<char>::copy(cString, cString + stringSize, buffer);
+        
+        this->count = this->capacity = stringSize;
 
+        this->buffer[stringSize - 1] = L'\0';
+
+    }
+    
+    inline String::String(std::string const& string) {
+
+        const size_t stringSize = string.size() + 1;
+        this->buffer = Allocator<char>::allocate(stringSize);
+
+        Allocator<char>::copy(string.data(), string.data() + stringSize, buffer);
+        
         this->count = this->capacity = stringSize;
 
         this->buffer[stringSize - 1] = L'\0';
@@ -42,29 +67,10 @@ namespace Nucleus {
     
     inline String::~String(){
         
-        Allocator<wchar_t>::release(buffer);
+        Allocator<char>::release(buffer);
         this->count = 0;
         this->capacity = 0;
         
-    }
-
-    inline String::String(const wchar_t* wString) {
-
-        if (!wString) { return; }
-
-        const size_t stringSize = wcslen(wString) + 1;
-        this->buffer = Allocator<wchar_t>::allocate(stringSize);
-
-#ifdef _WIN32
-        wcscpy_s(buffer, stringSize, wString);
-#else
-        wcscpy(buffer, wString);
-#endif
-
-        this->count = this->capacity = stringSize;
-
-        this->buffer[stringSize - 1] = L'\0';
-
     }
 
     inline String::String(const char* buf, size_t size) {
@@ -73,13 +79,9 @@ namespace Nucleus {
 
         const size_t stringSize = size + 1;
 
-        this->buffer = Allocator<wchar_t>::allocate(stringSize);
+        this->buffer = Allocator<char>::allocate(stringSize);
 
-#ifdef _WIN32
-        mbstowcs_s(nullptr, buffer, stringSize, buf, stringSize);
-#else
-        mbstowcs(buffer, buf, stringSize);
-#endif
+        Allocator<char>::copy(buf, buf + stringSize, buffer);
 
         this->count = this->capacity = stringSize;
         
@@ -87,29 +89,17 @@ namespace Nucleus {
 
     }
 
-    inline String::String(const wchar_t* buf, size_t size) {
-
-        if (!buf) { return; }
-
-        const size_t stringSize = size + 1;
-        this->buffer = Allocator<wchar_t>::allocate(stringSize);
-
-        Allocator<wchar_t>::copy(buf, buf + size, buffer);
-
-        this->buffer[size] = 0;
-
-        this->count = this->capacity = stringSize;
-
-    }
     
     inline String& String::operator=(String const& other){
         
-        if(&other == this) return *this;
+        if(&other == this ) return *this;
         
-        const wchar_t* start = other.buffer;
+        const char* start = other.buffer;
 
-        Allocator<wchar_t>::reallocate(buffer, capacity, other.capacity);
-        Allocator<wchar_t>::copy(start, start + other.capacity, buffer);
+        if (!other.buffer) return *this;
+
+        Allocator<char>::reallocate(buffer, capacity, other.capacity);
+        Allocator<char>::copy(start, start + other.capacity, buffer);
 
         this->count = other.count;
         this->capacity = other.capacity;
@@ -122,7 +112,7 @@ namespace Nucleus {
         
         if(&other == this) return *this;
 
-        Allocator<wchar_t>::release(buffer);
+        Allocator<char>::release(buffer);
 
         this->buffer = other.buffer;
         this->count = other.count;
@@ -184,7 +174,7 @@ namespace Nucleus {
 
         reserve(other.getSize());
 
-        Allocator<wchar_t>::copy(other.buffer, other.buffer + other.count, buffer + getSize());
+        Allocator<char>::copy(other.buffer, other.buffer + other.count, buffer + getSize());
 
         this->count += other.getSize();
 
@@ -195,20 +185,17 @@ namespace Nucleus {
     }
 
     inline bool String::contains(const char c) const {
-        return contains(static_cast<wchar_t>(c));
-    }
-
-    inline bool String::contains(const wchar_t wchar) const {
-            
-        for (auto const& c : *this) {
+        
+        for (auto const& ch : *this) {
                 
-            if(c == wchar) return true;
+            if(ch == c) return true;
                 
         }
             
         return false;
-            
+        
     }
+
 
     inline void String::clear() {
         memset(buffer, 0, capacity);
@@ -216,11 +203,7 @@ namespace Nucleus {
     }
 
     inline MutableArray<String> String::split(const char separator) const {
-        return split(static_cast<wchar_t>(separator));
-    }
-
-    inline MutableArray<String> String::split(const wchar_t separator) const {
-
+        
         MutableArray<String> components;
 
         const size_t sz = this->getSize();
@@ -251,8 +234,9 @@ namespace Nucleus {
         }
 
         return components;
-
+        
     }
+
 
     inline String String::substring(const size_t from, const size_t to) const {
 
@@ -276,7 +260,7 @@ namespace Nucleus {
                    
                 if(++j == otherSize) {
 
-                    Allocator<wchar_t>::move(buffer + i + 1, buffer + size, buffer + i + 1 - otherSize);
+                    Allocator<char>::move(buffer + i + 1, buffer + size, buffer + i + 1 - otherSize);
                     memset(buffer + size - otherSize, 0, otherSize);
                     this->count -= otherSize;
                     i = j = 0;
@@ -339,18 +323,12 @@ namespace Nucleus {
 
     inline std::ostream& operator<<(std::ostream& os, String const& string) {
 
-        for (const auto& wc : string) {
+        return os << string.buffer;
 
-            if(wc == 0) break;
-            os << static_cast<char>(wc);
-
-        }
-
-        return os;
     }
     
 }
 
-#include "StringFormat.inl"
+#include <Nucleus/Inline/StringFormat.inl>
 
 #endif

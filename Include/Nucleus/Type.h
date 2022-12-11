@@ -8,23 +8,29 @@
 
 namespace Nucleus {
 
-    class String;
-
     class Type {
 
     public:
 
         template<typename T>
-        static String getClassName(T const& object);
+        static class String name(T const& object);
 
         template<typename T>
-        static String getClassName();
+        static class String name();
+
+        static class String name(std::type_info const& type);
+
+        template<typename T>
+        static std::type_info const& of(T const& object);
+
+        template<typename T>
+        static std::type_info const& of();
 
 #ifdef __GNUG__
 
     private:
 
-        inline static String demangle(const char* name);
+        inline static class String demangle(const char* name);
 
 #endif
 
@@ -33,5 +39,5 @@ namespace Nucleus {
 }
 
 #define TYPE_INLINE
-#include "Inline/Type.inl"
+#include <Nucleus/Inline/Type.inl>
 #undef TYPE_INLINE

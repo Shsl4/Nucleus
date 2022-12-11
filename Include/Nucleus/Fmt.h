@@ -29,5 +29,5 @@ namespace Nucleus {
 }
 
 #define FMT_INLINE
-#include "Inline/FmtImpl.inl"
+#include <Nucleus/Inline/FmtImpl.inl>
 #undef FMT_INLINE

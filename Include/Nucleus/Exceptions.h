@@ -8,45 +8,61 @@ namespace Nucleus {
 
     public:
 
-        class BadKey : public std::runtime_error {
+    class Exception : public std::runtime_error {
 
         public:
-            
-            explicit BadKey(char const* const message) : std::runtime_error(message) {}
+
+            explicit Exception(char const* const message) : std::runtime_error(message) {}
 
         };
 
-        class OutOfRange : public std::runtime_error {
+        class BadKey : public Exception {
 
         public:
 
-            explicit OutOfRange(char const* const message) : std::runtime_error(message) {}
+            explicit BadKey(char const* const message) : Exception(message) {}
 
         };
 
-        class BadFormat : public std::runtime_error {
+        class OutOfRange : public Exception {
 
         public:
 
-            explicit BadFormat(char const* const message) : std::runtime_error(message) {}
+            explicit OutOfRange(char const* const message) : Exception(message) {}
+
+        };
+
+        class BadFormat : public Exception {
+
+        public:
+
+            explicit BadFormat(char const* const message) : Exception(message) {}
+
+        };
+
+        class BadType : public Exception {
+
+        public:
+
+            explicit BadType(char const* const message) : Exception(message) {}
 
         };
         
-        class NullPointer : public std::runtime_error {
+        class NullPointer : public Exception {
 
         public:
             
-            explicit NullPointer(char const* const message) : std::runtime_error(message) {}
+            explicit NullPointer(char const* const message) : Exception(message) {}
 
-            NullPointer() : std::runtime_error("Tried to dereference a nullptr.") {}
+            NullPointer() : Exception("Tried to dereference a nullptr.") {}
 
         };
         
-        class ParseError : public std::runtime_error {
+        class ParseError : public Exception {
 
         public:
             
-            explicit ParseError(char const* const message) : std::runtime_error(message) {}
+            explicit ParseError(char const* const message) : Exception(message) {}
 
         };
         

@@ -2,7 +2,7 @@
 
 #ifdef IMMUTABLE_INLINE
 
-#include "../ImmutableArray.h"
+#include <Nucleus/ImmutableArray.h>
 
 namespace Nucleus {
 

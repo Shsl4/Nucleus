@@ -122,6 +122,18 @@ namespace Nucleus {
             throw Exceptions::BadKey("The provided key does not exist in the map.");
             
         }
+
+        ValueType& operator[](KeyType const& key) const {
+
+            for(auto& p: *this){
+                if(p.key == key){
+                    return p.getValue();
+                }
+            }
+
+            throw Exceptions::BadKey("The provided key does not exist in the map.");
+
+        }
         
         bool operator+=(Entry const& element) {
             return add(element);

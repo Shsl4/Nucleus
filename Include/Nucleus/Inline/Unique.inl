@@ -21,7 +21,7 @@ namespace Nucleus{
 
     template<typename T>
     String Unique<T>::getClass() const {
-        return isValid() ? Type::getClassName(*object) : "nullptr";
+        return isValid() ? Type::name(*object) : "nullptr";
     }
 
     template<typename T>

@@ -34,8 +34,8 @@ namespace Nucleus {
 
             pointer get();
 
-            friend bool operator== (const Iterator& a, const Iterator& b) { return a.ptr == b.ptr; }
-            friend bool operator!= (const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; }
+            friend bool operator==(const Iterator& a, const Iterator& b) { return a.ptr == b.ptr; }
+            friend bool operator!=(const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; }
 
         private:
 
@@ -59,7 +59,7 @@ namespace Nucleus {
 
         T& operator[](size_t index);
 
-        T const& operator[](size_t index) const;
+        T& operator[](size_t index) const;
 
         virtual MutableArray& operator+=(T const& element);
 
@@ -84,6 +84,8 @@ namespace Nucleus {
         MutableArray& insert(MutableArray const& array, size_t index);
 
         ImmutableArray<T> toImmutable() const;
+        
+        bool isEmpty() const { return this->count == 0; }
 
         void reset();
 
@@ -112,5 +114,5 @@ namespace Nucleus {
 }
 
 #define MUTABLE_INLINE
-#include "Inline/MutableArray.inl"
+#include <Nucleus/Inline/MutableArray.inl>
 #undef MUTABLE_INLINE

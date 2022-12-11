@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/String.h>
@@ -12,7 +12,9 @@
 namespace Nucleus {
     
     class Console {
-        
+
+    public:
+
         const static inline String gray = "\33[0;30m";
         const static inline String red = "\33[0;31m";
         const static inline String green = "\33[0;32m";
@@ -31,9 +33,7 @@ namespace Nucleus {
         const static inline String lightCyan = "\33[0;96m";
         const static inline String lightWhite = "\33[0;97m";
         const static inline String reset = "\33[0m";
-        
-    public:
-        
+
         template<typename... Args>
         static void log(String const& fmt, Args&&... args){
             
@@ -48,6 +48,8 @@ namespace Nucleus {
 
         }
 
+        virtual void init(bool threaded = false) = 0;
+
     private:
 
         static void write(String const& string, FILE* file = stdout) {
@@ -57,8 +59,7 @@ namespace Nucleus {
             const auto size = static_cast<DWORD>(string.getSize());
             WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), string.begin(), size, nullptr, nullptr);
 #else
-            fwrite(string.begin(), sizeof(wchar_t), string.getSize() + 1, file);
-            fflush(stdout);
+            fwrite(string.begin(), sizeof(char), string.getSize(), file);
 #endif
 
         }

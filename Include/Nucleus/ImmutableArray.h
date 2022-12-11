@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nucleus/Allocator.h>
+#include <Nucleus/Collection.h>
 
 namespace Nucleus {
 
@@ -49,5 +50,5 @@ namespace Nucleus {
 	
 }
 #define IMMUTABLE_INLINE
-#include "Inline/ImmutableArray.inl"
+#include <Nucleus/Inline/ImmutableArray.inl>
 #undef IMMUTABLE_INLINE

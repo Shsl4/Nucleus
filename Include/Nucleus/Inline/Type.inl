@@ -2,12 +2,12 @@
 
 #ifdef TYPE_INLINE
 
-#include "../String.h"
+#include <Nucleus/String.h>
 
 namespace Nucleus{
 
     template<typename T>
-    String Type::getClassName(const T &object) {
+    String Type::name(const T &object) {
 
         const char* className = typeid(object).name();
 
@@ -23,7 +23,7 @@ namespace Nucleus{
     }
 
     template<typename T>
-    String Type::getClassName() {
+    String Type::name() {
 
         const char* className = typeid(T).name();
 
@@ -39,6 +39,7 @@ namespace Nucleus{
     }
 
 #ifdef __GNUG__
+    
     inline String Type::demangle(const char *name) {
 
         int status = -1;
@@ -54,8 +55,33 @@ namespace Nucleus{
         return name;
 
     }
+
+    inline class String Type::name(const std::type_info &type) {
+
+        const char* className = type.name();
+
+#ifdef __GNUG__
+        return demangle(className);
+#else
+        auto str = String(className);
+        str.removeOccurrences("class ");
+        str.removeOccurrences("struct ");
+        return str;
 #endif
 
+    }
+
+    template<typename T>
+    std::type_info const& Type::of() {
+       return typeid(T);
+    }
+
+    template<typename T>
+    std::type_info const& Type::of(const T &object) {
+        return typeid(object);
+    }
+
+#endif
 
 }
 

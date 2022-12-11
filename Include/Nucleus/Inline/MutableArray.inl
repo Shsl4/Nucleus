@@ -1,9 +1,10 @@
 #pragma once
-#include "../Exceptions.h"
+
+#include <Nucleus/Exceptions.h>
 
 #ifdef MUTABLE_INLINE
 
-#include "../ImmutableArray.h"
+#include <Nucleus/ImmutableArray.h>
 
 namespace Nucleus {
 
@@ -59,7 +60,7 @@ namespace Nucleus {
     }
 
     template <typename T>
-    T const& MutableArray<T>::operator[](size_t index) const {
+    T& MutableArray<T>::operator[](size_t index) const {
         if(index >= count) throw Exceptions::OutOfRange("MutableArray index out of range");
         return buffer[index];
     }
@@ -86,12 +87,17 @@ namespace Nucleus {
         
         const T* start = other.begin().get();
 
+        if (start == nullptr) {
+            this->count = 0;
+            this->capacity = 0;
+            return *this;
+        }
+
         Allocator<T>::reallocate(buffer, capacity, other.capacity);
         Allocator<T>::copy(start, start + other.capacity, buffer);
 
         this->count = other.count;
         this->capacity = other.capacity;
-            
         return *this;
             
     }

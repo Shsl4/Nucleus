@@ -124,7 +124,7 @@ namespace Nucleus {
             if(!scan && fmt.buffer[i] == '{') {
 
                 formatted.reserve(i - last);
-                Allocator<wchar_t>::copy(fmt.buffer + last, fmt.buffer + i, formatted.buffer + formatted.count);
+                Allocator<char>::copy(fmt.buffer + last, fmt.buffer + i, formatted.buffer + formatted.count);
                 formatted.count += i - last;
                 scan = true;
                 last = i + 1;
@@ -142,7 +142,7 @@ namespace Nucleus {
                     if(String const& r = arguments[nextArg]; r.count > 1){
                         
                         formatted.reserve(r.count);
-                        Allocator<wchar_t>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
+                        Allocator<char>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
                         formatted.count += r.getSize();
                         
                     }
@@ -165,7 +165,7 @@ namespace Nucleus {
                         if(r.count > 1){
                         
                             formatted.reserve(r.count);
-                            Allocator<wchar_t>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
+                            Allocator<char>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
                             formatted.count += r.getSize();
                         
                         }
@@ -188,7 +188,7 @@ namespace Nucleus {
 
         if (last != fmt.getSize()) {
             formatted.reserve(fmt.count - last);
-            Allocator<wchar_t>::copy(fmt.buffer + last, fmt.buffer + fmt.count, formatted.buffer + formatted.count);
+            Allocator<char>::copy(fmt.buffer + last, fmt.buffer + fmt.count, formatted.buffer + formatted.count);
             formatted.count += fmt.getSize() - last;
         }
 
@@ -203,6 +203,8 @@ namespace Nucleus {
     String String::fromInteger(T const& integral) {
             
         static_assert(std::is_integral_v<T>, "T must be an integral type");
+
+        if (integral == static_cast<T>(0)) return "0";
 
         // Static format buffer.
         static char buf[100];
@@ -222,14 +224,14 @@ namespace Nucleus {
 
         static_assert(std::is_floating_point_v<T>, "T must be an integral type");
 
-        return std::to_wstring(fp).c_str();
+        return std::to_string(fp).c_str();
             
     }
 
     template <typename T>
     String String::fromPointer(const T* pointer) {
 
-        if(!pointer) { return format("nullptr ({}*)", Type::getClassName<T>()); }
+        if(!pointer) { return format("nullptr ({}*)", Type::name<T>()); }
             
         const auto address = reinterpret_cast<intptr_t>(pointer);
             
@@ -240,7 +242,7 @@ namespace Nucleus {
             
         const String strAddress(buf, strlen(buf));
             
-        return format("0x{} ({}*)", strAddress, Type::getClassName<T>());
+        return format("0x{} ({}*)", strAddress, Type::name<T>());
             
     }
 

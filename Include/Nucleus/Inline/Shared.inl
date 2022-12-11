@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Nucleus/Shared.h>
-
 #ifdef SHARED_INLINE
 
 namespace Nucleus {
@@ -128,11 +126,6 @@ namespace Nucleus {
 
         return *this;
             
-    }
-    
-    template <typename T>
-    String Shared<T>::getClass() const {
-        return isValid() ? Type::getClassName(*object) : "nullptr";
     }
 
     template <typename T>
@@ -261,12 +254,6 @@ namespace Nucleus {
             
         return *this;
             
-    }
-
-        
-    template <typename T>
-    String Weak<T>::getClass() const {
-        return isValid() ? Type::getClassName(*object) : "nullptr";
     }
 
     template <typename T>

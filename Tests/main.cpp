@@ -1,13 +1,4 @@
-﻿#include <Nucleus/Allocator.h>
-#include <Nucleus/StaticArray.h>
-#include <Nucleus/ImmutableArray.h>
-#include <Nucleus/MutableArray.h>
-#include <Nucleus/Map.h>
-#include <Nucleus/String.h>
-#include <Nucleus/Unique.h>
-#include <Nucleus/Console.h>
-#include <Nucleus/Shared.h>
-#include <Nucleus/ManagedArray.h>
+#include <Nucleus/Nucleus.h>
 
 #include <iostream>
 #include <vector>
@@ -262,19 +253,66 @@ private:
 
 };
 
+
+class Shape
+{
+public:
+    virtual ~Shape() {}
+    NODISCARD virtual double get_area() const = 0;
+};
+
+class Circle : public Shape
+{
+public:
+    Circle() : radius_(12.5) {}
+    NODISCARD double get_area() const override { return 3.14 * radius_ * radius_; }
+
+private:
+    double radius_;
+
+};
+
+REFLECTABLE(Circle)
+REFLECTABLE(String)
+REFLECTABLE(Object)
+TEMPLATE_REFLECTABLE(SmartArray, int)
+
 int main(int argc, char** argv) {
 
 	const auto ss = Shared<String>::make("Unique String!");
 	const auto si = Unique<int>::make(9);
 
-	Console::log(L"안녕하세요 {} 😊 {4} {5} {2} {} {6}\n", L"世界", 48.0f, "World", String("Test"), ss, "Hello", si);
+	Console::log("안녕하세요 {} 😊 {4} {5} {2} {} {6}\n", "世界", 48.0f, "World", String("Test"), ss, "Hello", si);
 
-	bool b = false;
-	bool* bp = &b;
+	bool bb = false;
+	bool* bp = &bb;
 
 	UInt64* llp = nullptr;
 
-	Console::error(L"{} 😃 {} | 😨 {}\n", bp, b, llp);
+	Console::error("{} 😃 {} | 😨 {}\n", bp, bb, llp);
+
+    SmartArray<int> arr;
+
+    int* a = Allocator<int>::construct(5);
+    int* b = Allocator<int>::construct(6);
+    int* c = Allocator<int>::construct(7);
+    int* d = Allocator<int>::construct(8);
+
+    arr.add(a).add(b).add(c).add(d);
+
+    Console::log("{}{}{}\n", Console::green, arr.contains(a), Console::reset);
+
+    Any console = ReflectionFactory::createObject("ExplorerConsole");
+    Any sh = ReflectionFactory::createObject("Circle");
+    Any arr2 = ReflectionFactory::createObject("SmartArray<int>");
+    Any str = ReflectionFactory::createObject("String");
+
+    auto& g = *arr2.get<SmartArray<int>>();
+
+    g.add(new int(5)).add(new int(2));
+
+    Console::log("{}\n", sh.get<Circle>()->get_area());
+    Console::log("{} {}\n", g[0], g[1]);
 
 	return 0;
 

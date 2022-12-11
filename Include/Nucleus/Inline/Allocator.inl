@@ -2,17 +2,13 @@
 
 #ifdef ALLOCATOR_INLINE
 
-#include "../AllocationObserver.h"
-
 namespace Nucleus {
 
     template <typename T>
     T* Allocator<T>::allocate(size_t size) {
             
         if(size == 0) return nullptr;
-            
-        AllocationObserver::statAlloc<T>(size);
-            
+
         return new T[size];
             
     }
@@ -21,9 +17,7 @@ namespace Nucleus {
     void Allocator<T>::release(T*& ptr) {
             
         if(!ptr) return;
-            
-        AllocationObserver::statRelease<T>();
-            
+
         delete[] ptr;
             
         ptr = nullptr;
@@ -34,8 +28,7 @@ namespace Nucleus {
     template <typename ... Args>
     T* Allocator<T>::construct(Args&&... args) {
             
-        AllocationObserver::statAlloc<T>(1);
-        return new T(args...);
+        return new T(std::forward<Args>(args)...);
             
     }
 
@@ -45,9 +38,7 @@ namespace Nucleus {
         if(!ptr) return;
             
         delete ptr;
-            
-        AllocationObserver::statRelease<T>();
-            
+
         ptr = nullptr;
             
     }

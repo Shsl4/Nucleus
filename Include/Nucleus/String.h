@@ -2,11 +2,12 @@
 
 #include <charconv>
 #include <functional>
+#include <iostream>
+#include <string>
+
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/Allocator.h>
 #include <Nucleus/MutableArray.h>
-#include <iostream>
-#include <string>
 
 namespace Nucleus {
     
@@ -17,8 +18,10 @@ namespace Nucleus {
         String() = default;
         
         ~String();
-
+        
         String(String const& other);
+        
+        String(std::string const& other);
         
         String(String&& other) noexcept;
         
@@ -27,10 +30,6 @@ namespace Nucleus {
         String(const char* cString);
 
         String(const char* buf, size_t size);
-
-        String(const wchar_t* wString);
-
-        String(const wchar_t* buf, size_t size);
         
         String& operator=(String const& other);
         
@@ -39,6 +38,13 @@ namespace Nucleus {
         String operator+(String const& other) const;
 
         String& operator+=(String const& other);
+        
+        char& operator[](size_t index) const{
+            
+            assert(index < count);
+            return buffer[index];
+            
+        }
         
         bool operator==(String const& other) const;
 
@@ -50,21 +56,17 @@ namespace Nucleus {
         
         NODISCARD MutableArray<String> split(char separator) const;
         
-        NODISCARD MutableArray<String> split(wchar_t separator) const;
-
         NODISCARD String substring(size_t from, size_t to) const;
 
         NODISCARD bool contains(char c) const;
-
-        NODISCARD bool contains(wchar_t wchar) const;
 
         void clear();
 
         void removeOccurrences(String const& other);
 
-        NODISCARD wchar_t* begin() const { return buffer; }
+        NODISCARD char* begin() const { return buffer; }
         
-        NODISCARD wchar_t* end() const { return buffer + count; }
+        NODISCARD char* end() const { return buffer + count; }
         
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
@@ -87,12 +89,14 @@ namespace Nucleus {
         friend std::ostream& operator<<(std::ostream& os, String const& string);
         
         FORCEINLINE size_t getSize() const { return count - 1; }
+        
+        bool isEmpty() const { return this->count <= 1; }
 
-        FORCEINLINE static bool isInteger(const wchar_t c) {
+        FORCEINLINE static bool isInteger(const char c) {
             return c >= L'0' && c <= L'9';
         }
         
-        FORCEINLINE static UInt16 wcharToInteger(const wchar_t c) {
+        FORCEINLINE static UInt16 wcharToInteger(const char c) {
             return c - L'0';
         }
         
@@ -103,7 +107,7 @@ namespace Nucleus {
             if(count + size > capacity){
                 
                 const size_t newSize = capacity + size;
-                Allocator<wchar_t>::reallocate(buffer, capacity, newSize);
+                Allocator<char>::reallocate(buffer, capacity, newSize);
                 memset(buffer + count, 0, newSize - count);
                 capacity = newSize;
                 
@@ -111,7 +115,7 @@ namespace Nucleus {
 
         }
         
-        wchar_t* buffer = nullptr;
+        char* buffer = nullptr;
         size_t count = 0;
         size_t capacity = 0;
         
@@ -120,5 +124,5 @@ namespace Nucleus {
 }
 
 #define STRING_INLINE
-#include "Inline/String.inl"
+#include <Nucleus/Inline/String.inl>
 #undef STRING_INLINE

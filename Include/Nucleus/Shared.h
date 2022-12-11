@@ -2,8 +2,7 @@
 
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/Exceptions.h>
-#include <Nucleus/String.h>
-#include "Type.h"
+#include <Nucleus/Type.h>
 
 namespace Nucleus {
 
@@ -16,8 +15,8 @@ namespace Nucleus {
         
         RefCounter() = default;
 
-        FORCEINLINE bool valid() const noexcept { return references > 0; }
-        FORCEINLINE bool exhausted() const noexcept { return references == 0 && weakReferences == 0; }
+        NODISCARD FORCEINLINE bool valid() const noexcept { return references > 0; }
+        NODISCARD FORCEINLINE bool exhausted() const noexcept { return references == 0 && weakReferences == 0; }
         
         FORCEINLINE void ref() noexcept { ++references; }
         FORCEINLINE void refWeak() noexcept { ++weakReferences; }
@@ -88,15 +87,17 @@ namespace Nucleus {
         FORCEINLINE T& operator*() const { assertValid(); return *object; }
         
         FORCEINLINE T* operator->() const { assertValid(); return object; }
+        
+        FORCEINLINE T* pointer() { assertValid(); return object; }
+                
+        FORCEINLINE T* pointer() const { assertValid(); return object; }
 
         FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
 
-        FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
+        NODISCARD FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
 
         Weak<T> makeWeak() const;
 
-        String getClass() const;
-        
     private:
         
         void drop();
@@ -156,13 +157,15 @@ namespace Nucleus {
         FORCEINLINE T& operator*() const { assertValid(); return *object; }
         
         FORCEINLINE T* operator->() const { assertValid(); return object; }
+        
+        FORCEINLINE T* pointer() { assertValid(); return object; }
+                
+        FORCEINLINE T* pointer() const { assertValid(); return object; }
 
         FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
-        
-        FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
 
-        String getClass() const;
-        
+        NODISCARD FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
+
     private:
         
         T* object = nullptr;
@@ -173,5 +176,5 @@ namespace Nucleus {
 }
 
 #define SHARED_INLINE
-#include "Inline/Shared.inl"
+#include <Nucleus/Inline/Shared.inl>
 #undef SHARED_INLINE
