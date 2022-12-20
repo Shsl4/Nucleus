@@ -12,215 +12,51 @@ namespace Nucleus {
 
     public:
 
-        SmartArray() : arraySize(0), arrayCapacity(10), buffer(Allocator<T*>::allocate(arrayCapacity)),
-                       counter(Allocator<RefCounter>::construct()) {
+        SmartArray();
 
-            this->counter->ref();
+        SmartArray(SmartArray const& other);
 
-        }
+        SmartArray(SmartArray&& other) noexcept;
 
-        SmartArray(SmartArray const& other){
-            *this = other;
-        }
+        ~SmartArray() override;
 
-        SmartArray(SmartArray&& other) noexcept {
-            *this = std::move(other);
-        }
+        SmartArray& operator=(SmartArray const& other);
 
-        ~SmartArray() override {
-            decref();
-        }
+        SmartArray& operator=(SmartArray&& other) noexcept;
 
-        SmartArray& operator=(SmartArray const& other){
+        NODISCARD typename Super::Iterator begin() const override;
 
-            if(&other == this) return *this;
+        NODISCARD typename Super::Iterator end() const override;
 
-            decref();
+        NODISCARD size_t size() const override;
 
-            Allocator<T*>::release(buffer);
+        NODISCARD size_t capacity() const override;
 
-            if (other.capacity() == 0) return *this;
+        NODISCARD T *&get(size_t index) const override;
 
-            this->buffer = Allocator<T*>::allocate(other.capacity());
-            Allocator<T*>::copy(other.buffer, other.buffer + other.arraySize, this->buffer);
+        auto add(T *const &element) -> decltype(*this)& override;
 
-            this->arraySize = other.arraySize;
-            this->arrayCapacity = other.arrayCapacity;
-            this->counter = other.counter;
+        auto addAll(const Collection<T *> &array) -> decltype(*this) & override;
 
-            this->counter->ref();
+        auto insert(T *const &element, size_t index) -> decltype(*this)& override;
 
-            return *this;
+        auto insertAll(const Collection<T *> &array, size_t index) -> decltype(*this) & override;
 
-        }
+        bool removeAt(size_t index) override;
 
-        SmartArray& operator==(SmartArray&& other) noexcept{
+        bool removeAllOf(T *const &element) override;
 
-            if(&other == this) return *this;
+        bool contains(T *const &element) const override;
 
-            decref();
+        void clear() override;
 
-            Allocator<T*>::release(buffer);
-
-            this->buffer = other.buffer;
-            this->counter = other.counter;
-            this->arraySize = other.arraySize;
-            this->arrayCapacity = other.arrayCapacity;
-
-            other.buffer = nullptr;
-            other.counter = nullptr;
-            other.arraySize = 0;
-            other.arrayCapacity = 0;
-
-            return *this;
-
-        }
-
-        NODISCARD typename Super::Iterator begin() const override {
-            return typename Super::Iterator(buffer);
-        }
-
-        NODISCARD typename Super::Iterator end() const override {
-            return typename Super::Iterator(buffer + size());
-        }
-
-        NODISCARD size_t size() const override {
-            return this->arraySize;
-        }
-
-        NODISCARD size_t capacity() const override {
-            return this->arrayCapacity;
-        }
-
-        NODISCARD T *&get(size_t index) const override {
-            nassertf(index < arraySize, String::format("SmartArray: Index {} out of bounds ({})", index, arraySize));
-            return buffer[index];
-        }
-
-        auto add(T *const &element) -> decltype(*this)& override {
-
-            if (!element) return *this;
-
-            extend(1);
-            buffer[arraySize++] = element;
-            return *this;
-
-        }
-
-        auto addAll(const Collection<T *> &array) -> decltype(*this) & override {
-
-            extend(array.size());
-
-            for(T* element : array){
-                buffer[arraySize++] = element;
-            }
-
-            return *this;
-        }
-
-        auto insert(T *const &element, size_t index) -> decltype(*this) & override {
-
-            if (!element) return *this;
-
-            if (index >= arraySize) {
-                return add(element);
-            }
-
-            extend(1);
-
-            Allocator<T*>::move(buffer + index, buffer + arraySize, buffer + index + 1);
-
-            buffer[index] = element;
-            ++arraySize;
-
-            return *this;
-
-        }
-
-        auto insertAll(const Collection<T *> &array, size_t index) -> decltype(*this) & override {
-
-            if (index >= arraySize) {
-                return addAll(array);
-            }
-
-            extend(array.size());
-
-            Allocator<T*>::move(buffer + index, buffer + arraySize, buffer + index + array.size() + 1);
-
-            for(T* element : array){
-
-                buffer[index++] = element;
-                ++arraySize;
-
-            }
-
-            return *this;
-
-        }
-
-        bool removeAt(size_t index) override {
-            return false;
-        }
-
-        bool removeAllOf(T *const &element) override {
-            return false;
-        }
-
-        bool contains(T *const &element) override {
-
-            for (size_t i = 0; i < arraySize; ++i) {
-                if (buffer[i] == element) return true;
-            }
-
-            return false;
-
-        }
-
-        void clear() override {
-
-            for (size_t i = 0; i < arraySize; ++i) {
-                Allocator<T>::destroy(buffer[i]);
-            }
-
-            Allocator<T*>::release(buffer);
-
-            this->arraySize = 0;
-            this->arrayCapacity = 0;
-
-        }
-
-        bool isEmpty() override {
-            return arraySize == 0;
-        }
+        NODISCARD bool isEmpty() const override;
 
     private:
 
-        void extend(size_t size) {
+        void extend(size_t size);
 
-            if(arraySize + size > arrayCapacity){
-
-                const size_t newSize = arrayCapacity > 0 ? arrayCapacity * 2 : 5;
-                Allocator<T*>::reallocate(buffer, arrayCapacity, newSize);
-                arrayCapacity = newSize;
-
-            }
-
-        }
-
-        void decref(){
-
-            if (!counter) return;
-
-            counter->unref();
-
-            if (counter->exhausted()){
-
-                Allocator<RefCounter>::destroy(counter);
-                clear();
-
-            }
-
-        }
+        void decref();
 
         size_t arrayCapacity = 0;
         size_t arraySize = 0;
@@ -230,3 +66,7 @@ namespace Nucleus {
     };
 
 }
+
+#define SMARTARRAY_INLINE
+#include <Nucleus/Inline/SmartArray.inl>
+#undef SMARTARRAY_INLINE

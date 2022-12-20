@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/Allocator.h>
@@ -11,13 +12,15 @@
 
 namespace Nucleus {
     
-    class String final {
+    class String final : public Collection<char> {
+
+        using Super = Collection<char>;
 
     public:
 
         String() = default;
         
-        ~String();
+        ~String() override;
         
         String(String const& other);
         
@@ -38,42 +41,31 @@ namespace Nucleus {
         String operator+(String const& other) const;
 
         String& operator+=(String const& other);
-        
-        char& operator[](size_t index) const{
-            
-            assert(index < count);
-            return buffer[index];
-            
-        }
-        
+
+        auto add(const char &element) -> decltype(*this) & override;
+
+        auto addAll(const Collection<char> &array) -> decltype(*this) & override;
+
+        auto insert(const char &element, size_t index) -> decltype(*this) & override;
+
+        auto insertAll(const Collection<char> &array, size_t index) -> decltype(*this) & override;
+
+        bool removeAt(size_t index) override;
+
+        bool removeAllOf(const char &element) override;
+
         bool operator==(String const& other) const;
 
         bool operator==(const char* other) const;
 
-        String& append(String const& other);
-        
-        NODISCARD MutableArray<String> split(String const& separators) const;
-        
-        NODISCARD MutableArray<String> split(char separator) const;
-        
-        NODISCARD String substring(size_t from, size_t to) const;
+        String& insertAll(const char* string, size_t index);
 
-        NODISCARD bool contains(char c) const;
-
-        void clear();
+        void clear() override;
 
         void removeOccurrences(String const& other);
-
-        NODISCARD char* begin() const { return buffer; }
-        
-        NODISCARD char* end() const { return buffer + count; }
         
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
-        
-        NODISCARD Float64 toFloat64() const;
-        
-        NODISCARD Int64 toInteger() const;
         
         template<typename T>
         static String fromInteger(T const& integral);
@@ -84,32 +76,55 @@ namespace Nucleus {
         template<typename T>
         static String fromPointer(const T* pointer);
 
+        NODISCARD Super::Iterator begin() const override;
+
+        NODISCARD Super::Iterator end() const override;
+
+        NODISCARD char& get(size_t index) const override;
+
+        NODISCARD size_t size() const override { return count - 1; }
+
+        NODISCARD bool contains(const char &element) const override;
+
+        NODISCARD bool isEmpty() const override;
+
+        NODISCARD MutableArray<String> split(String const& separators) const;
+
+        NODISCARD MutableArray<String> split(char separator) const;
+
+        NODISCARD String substring(size_t from, size_t to) const;
+
+        NODISCARD size_t capacity() const override;
+
+        NODISCARD Float64 toFloat64() const;
+
+        NODISCARD Int64 toInteger() const;
+
+        NODISCARD static bool isInteger(const char c) {
+            return c >= L'0' && c <= L'9';
+        }
+
+        NODISCARD static UInt16 wcharToInteger(const char c) {
+            return c - L'0';
+        }
+
+
+    private:
+
+        friend String operator+(const char* cStr, String const& string);
+
         friend std::wostream& operator<<(std::wostream& os, String const& string);
 
         friend std::ostream& operator<<(std::ostream& os, String const& string);
-        
-        FORCEINLINE size_t getSize() const { return count - 1; }
-        
-        bool isEmpty() const { return this->count <= 1; }
 
-        FORCEINLINE static bool isInteger(const char c) {
-            return c >= L'0' && c <= L'9';
-        }
-        
-        FORCEINLINE static UInt16 wcharToInteger(const char c) {
-            return c - L'0';
-        }
-        
-    private:
+        void extend(const size_t size) {
 
-        void reserve(const size_t size) {
-
-            if(count + size > capacity){
+            if(count + size > storage){
                 
-                const size_t newSize = capacity + size;
-                Allocator<char>::reallocate(buffer, capacity, newSize);
+                const size_t newSize = storage + size;
+                Allocator<char>::reallocate(buffer, storage, newSize);
                 memset(buffer + count, 0, newSize - count);
-                capacity = newSize;
+                storage = newSize;
                 
             }
 
@@ -117,7 +132,7 @@ namespace Nucleus {
         
         char* buffer = nullptr;
         size_t count = 0;
-        size_t capacity = 0;
+        size_t storage = 0;
         
     };
     

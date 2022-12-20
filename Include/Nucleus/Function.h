@@ -16,7 +16,7 @@ namespace Nucleus {
         ErasedFunction() = default;
 
         template<typename T, typename... Args>
-        ErasedFunction(T(*func)(Args...)) : function(Nucleus::Any(func)) {}
+        ErasedFunction(T(*func)(Args...)) : function(Nucleus::Any(std::move(func))) {}
 
         template<typename T, typename... Args>
         T invoke(Args&&... args) {
@@ -46,7 +46,7 @@ namespace Nucleus {
 
     public:
 
-        template<size_t n, typename _ = std::enable_if<(sizeof...(Args) > 0)>>
+        template<size_t n> requires (sizeof...(Args) > 0 && n < sizeof...(Args))
         using ArgType = std::tuple_element_t<n, std::tuple<Args...>>;
 
         Function() = default;
@@ -86,7 +86,7 @@ namespace Nucleus {
 
     public:
 
-        template<size_t n, typename _ = std::enable_if<(sizeof...(Args) > 0)>>
+        template<size_t n> requires (sizeof...(Args) > 0 && n < sizeof...(Args))
         using ArgType = std::tuple_element_t<n, std::tuple<Args...>>;
 
         Function() = default;

@@ -3,14 +3,14 @@
 #ifdef STRING_INLINE
 
 #include <Nucleus/Shared.h>
-#include <sstream>
+#include "Nucleus/String.h"
 
 namespace Nucleus {
 
     inline void ensure(bool condition, class String const& str){
 
         if(!condition){
-            throw Exceptions::Exception(str.begin());
+            throw Exceptions::Exception(str.begin().get());
         }
 
     }
@@ -33,7 +33,7 @@ namespace Nucleus {
 
     inline String::String(size_t cap) {
 
-        reserve(cap);
+        extend(cap);
         
     }
     
@@ -45,8 +45,8 @@ namespace Nucleus {
         this->buffer = Allocator<char>::allocate(stringSize);
 
         Allocator<char>::copy(cString, cString + stringSize, buffer);
-        
-        this->count = this->capacity = stringSize;
+
+        this->count = this->storage = stringSize;
 
         this->buffer[stringSize - 1] = L'\0';
 
@@ -58,8 +58,8 @@ namespace Nucleus {
         this->buffer = Allocator<char>::allocate(stringSize);
 
         Allocator<char>::copy(string.data(), string.data() + stringSize, buffer);
-        
-        this->count = this->capacity = stringSize;
+
+        this->count = this->storage = stringSize;
 
         this->buffer[stringSize - 1] = L'\0';
 
@@ -69,7 +69,7 @@ namespace Nucleus {
         
         Allocator<char>::release(buffer);
         this->count = 0;
-        this->capacity = 0;
+        this->storage = 0;
         
     }
 
@@ -83,7 +83,7 @@ namespace Nucleus {
 
         Allocator<char>::copy(buf, buf + stringSize, buffer);
 
-        this->count = this->capacity = stringSize;
+        this->count = this->storage = stringSize;
         
         this->buffer[stringSize - 1] = L'\0';
 
@@ -98,11 +98,11 @@ namespace Nucleus {
 
         if (!other.buffer) return *this;
 
-        Allocator<char>::reallocate(buffer, capacity, other.capacity);
-        Allocator<char>::copy(start, start + other.capacity, buffer);
+        Allocator<char>::reallocate(buffer, storage, other.storage);
+        Allocator<char>::copy(start, start + other.storage, buffer);
 
         this->count = other.count;
-        this->capacity = other.capacity;
+        this->storage = other.storage;
             
         return *this;
         
@@ -116,22 +116,21 @@ namespace Nucleus {
 
         this->buffer = other.buffer;
         this->count = other.count;
-        this->capacity = other.capacity;
+        this->storage = other.storage;
 
         other.buffer = nullptr;
         other.count = 0;
-        other.capacity = 0;
+        other.storage = 0;
             
         return *this;
-            
         
     }
 
     inline bool String::operator==(String const& other) const {
 
-        if (getSize() != other.getSize()) return false;
+        if (size() != other.size()) return false;
 
-        for (size_t i = 0; i < getSize(); ++i) {
+        for (size_t i = 0; i < size(); ++i) {
 
             if (buffer[i] != other.buffer[i]) {
                 return false;
@@ -159,46 +158,16 @@ namespace Nucleus {
 
     inline String String::operator+(String const& other) const {
         auto e = String(*this);
-        e.append(other);
+        e.addAll(other);
         return e;
-        
     }
     
     inline String& String::operator+=(String const& other) {
-        
-        return append(other);
-        
+        return addAll(other);
     }
-
-    inline String& String::append(String const& other) {
-
-        reserve(other.getSize());
-
-        Allocator<char>::copy(other.buffer, other.buffer + other.count, buffer + getSize());
-
-        this->count += other.getSize();
-
-        memset(buffer + count, 0, capacity - count);
-        
-        return *this;
-        
-    }
-
-    inline bool String::contains(const char c) const {
-        
-        for (auto const& ch : *this) {
-                
-            if(ch == c) return true;
-                
-        }
-            
-        return false;
-        
-    }
-
 
     inline void String::clear() {
-        memset(buffer, 0, capacity);
+        memset(buffer, 0, storage);
         this->count = 0;
     }
 
@@ -206,7 +175,7 @@ namespace Nucleus {
         
         MutableArray<String> components;
 
-        const size_t sz = this->getSize();
+        const size_t sz = this->size();
         size_t from = 0;
 
         for (size_t i = 0; i < sz; ++i) {
@@ -249,8 +218,8 @@ namespace Nucleus {
 
     inline void String::removeOccurrences(String const& other) {
             
-        const size_t size = getSize();
-        const size_t otherSize = other.getSize();
+        const size_t size = this->size();
+        const size_t otherSize = other.size();
 
         size_t i = 0, j = 0;
             
@@ -286,7 +255,7 @@ namespace Nucleus {
 
         MutableArray<String> components;
 
-        const size_t sz = this->getSize();
+        const size_t sz = this->size();
         size_t from = 0;
 
         for (size_t i = 0; i < sz; ++i) {
@@ -322,13 +291,139 @@ namespace Nucleus {
     }
 
     inline std::ostream& operator<<(std::ostream& os, String const& string) {
-
         return os << string.buffer;
+    }
+
+    String operator+(const char *cStr, String const &string) {
+        String newString = cStr;
+        return newString.addAll(string);
+    }
+
+    String::Super::Iterator String::begin() const {
+        return Iterator(buffer);
+    }
+
+    String::Super::Iterator String::end() const {
+        return Iterator(buffer + count - 1);
+    }
+
+    char &String::get(size_t index) const {
+        return buffer[index];
+    }
+
+    auto String::add(const char &element) -> decltype(*this)& {
+
+        if (!element) return *this;
+
+        extend(1);
+        buffer[count++] = element;
+        return *this;
 
     }
-    
+
+    auto String::addAll(const Collection<char> &array) -> decltype(*this)& {
+
+        extend(array.size());
+
+        Allocator<char>::copy(array.begin().get(), array.end().get(), buffer + size());
+
+        this->count += array.size();
+
+        return *this;
+
+    }
+
+    auto String::insert(const char &element, size_t index) -> decltype(*this)& {
+
+        if (!element) return *this;
+
+        if (index >= count) {
+            return add(element);
+        }
+
+        extend(1);
+
+        Allocator<char>::move(buffer + index, buffer + count, buffer + index + 1);
+
+        buffer[index] = element;
+        ++count;
+
+        return *this;
+
+    }
+
+    auto String::insertAll(const Collection<char> &array, size_t index) -> decltype(*this)& {
+
+        return insertAll(array.begin().get(), index);
+
+    }
+
+
+    String& String::insertAll(const char *string, size_t index) {
+
+        const size_t stringSize = strlen(string);
+
+        if (stringSize == 0) return *this;
+
+        extend(stringSize);
+
+        Allocator<char>::move(buffer + index, buffer + count, buffer + index + stringSize);
+
+        for(size_t i = 0; i < stringSize; ++i){
+
+            buffer[index++] = string[i];
+            ++count;
+
+        }
+
+        return *this;
+
+    }
+
+    bool String::removeAt(size_t index) {
+
+        if (index > size()) return false;
+
+        Allocator<char>::move(buffer + index + 1, buffer + count, buffer + index);
+
+        --count;
+
+        return true;
+
+    }
+
+    bool String::removeAllOf(const char &element) {
+
+        bool r = false;
+
+        for(size_t i = 0; i < size(); ++i){
+
+            if (buffer[i] == element){
+                removeAt(i--);
+                r = true;
+            }
+
+        }
+
+        return r;
+
+    }
+
+    bool String::contains(const char &element) const {
+
+        for(auto& c : *this) {
+            if(c == element) return true;
+        }
+
+        return false;
+
+    }
+
+    bool String::isEmpty() const { return count == 0; }
+
+    size_t String::capacity() const { return storage; }
+
 }
 
 #include <Nucleus/Inline/StringFormat.inl>
-
 #endif

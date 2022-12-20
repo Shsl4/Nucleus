@@ -33,8 +33,8 @@ namespace Nucleus {
 
     };
 
-    template<typename Integral>
-    class Fmt<Integral, EnableIf<std::is_integral_v<Integral>, Integral>> {
+    template<typename Integral> requires std::is_integral_v<Integral>
+    class Fmt<Integral> {
 
     public:
 
@@ -45,8 +45,8 @@ namespace Nucleus {
 
     };
 
-    template<typename FloatingPoint>
-    class Fmt<FloatingPoint, EnableIf<std::is_floating_point_v<FloatingPoint>, FloatingPoint>> {
+    template<typename FloatingPoint> requires std::is_floating_point_v<FloatingPoint>
+    class Fmt<FloatingPoint> {
 
     public:
 
@@ -57,8 +57,8 @@ namespace Nucleus {
 
     };
 
-    template<typename Pointer>
-    class Fmt<Pointer, EnableIf<std::is_pointer_v<Pointer>, Pointer>> {
+    template<typename Pointer> requires std::is_pointer_v<Pointer>
+    class Fmt<Pointer> {
 
     public:
 

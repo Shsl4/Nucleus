@@ -10,8 +10,13 @@ namespace Nucleus {
 
         Any() = default;
 
-        template <typename T>
+        template <typename T> requires (!std::is_base_of_v<Any, T>)
         explicit Any(T const& value) : pointer(Shared<Derived<T>>::make(value)) {
+
+        }
+
+        template <typename T> requires (!std::is_base_of_v<Any, T>)
+        explicit Any(T&& value) : pointer(Shared<Derived<T>>::make(std::forward<T>(value))) {
 
         }
 

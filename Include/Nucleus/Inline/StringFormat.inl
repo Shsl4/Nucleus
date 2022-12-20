@@ -9,9 +9,9 @@ namespace Nucleus {
     
     inline Float64 String::toFloat64() const {
         
-        if(getSize() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
+        if(size() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
 
-        const auto max = static_cast<Int64>(getSize());
+        const auto max = static_cast<Int64>(size());
         double value = 0;
         const bool negative = buffer[0] == '-';
 
@@ -59,9 +59,9 @@ namespace Nucleus {
     
     inline Int64 String::toInteger() const {
         
-        if(getSize() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
+        if(size() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
 
-        const size_t max = getSize();
+        const size_t max = size();
         const bool negative = buffer[0] == '-';
         Int64 value = 0;
 
@@ -83,9 +83,8 @@ namespace Nucleus {
         
     }
     
-    template<typename T, typename... Args>
-    EnableIf<HasFmt<T>::value, void>
-    expand(MutableArray<String>& storage, T const& element, Args&& ... args) {
+    template<typename T, typename... Args> requires HasFmt<T>::value
+    void expand(MutableArray<String>& storage, T const& element, Args&& ... args) {
                 
         storage += Fmt<T>::format(element);
         
@@ -93,9 +92,8 @@ namespace Nucleus {
         
     }
     
-    template<typename T, typename... Args>
-    EnableIf<HasFmt<T>::value, void>
-    expand(MutableArray<String>& storage, T const& element) {
+    template<typename T> requires HasFmt<T>::value
+    void expand(MutableArray<String>& storage, T const& element) {
         
         storage += Fmt<T>::format(element);
         
@@ -113,17 +111,17 @@ namespace Nucleus {
         
         if(arguments.getCount() == 0) return fmt;
 
-        String formatted(fmt.getSize());
+        String formatted(fmt.size());
 
         size_t nextArg = 0;
         size_t last = 0;
         bool scan = false;
 
-        for (size_t i = 0; i < fmt.getSize(); ++i) {
+        for (size_t i = 0; i < fmt.size(); ++i) {
 
             if(!scan && fmt.buffer[i] == '{') {
 
-                formatted.reserve(i - last);
+                formatted.extend(i - last);
                 Allocator<char>::copy(fmt.buffer + last, fmt.buffer + i, formatted.buffer + formatted.count);
                 formatted.count += i - last;
                 scan = true;
@@ -140,10 +138,10 @@ namespace Nucleus {
                     }
 
                     if(String const& r = arguments[nextArg]; r.count > 1){
-                        
-                        formatted.reserve(r.count);
+
+                        formatted.extend(r.count);
                         Allocator<char>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
-                        formatted.count += r.getSize();
+                        formatted.count += r.size();
                         
                     }
                     
@@ -163,10 +161,10 @@ namespace Nucleus {
                         String const& r = arguments[index];
 
                         if(r.count > 1){
-                        
-                            formatted.reserve(r.count);
+
+                            formatted.extend(r.count);
                             Allocator<char>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
-                            formatted.count += r.getSize();
+                            formatted.count += r.size();
                         
                         }
      
@@ -186,10 +184,10 @@ namespace Nucleus {
             
         }
 
-        if (last != fmt.getSize()) {
-            formatted.reserve(fmt.count - last);
+        if (last != fmt.size()) {
+            formatted.extend(fmt.count - last);
             Allocator<char>::copy(fmt.buffer + last, fmt.buffer + fmt.count, formatted.buffer + formatted.count);
-            formatted.count += fmt.getSize() - last;
+            formatted.count += fmt.size() - last;
         }
 
         // Add 1 to count the null byte.

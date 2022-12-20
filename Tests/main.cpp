@@ -300,7 +300,9 @@ int main(int argc, char** argv) {
 
     arr.add(a).add(b).add(c).add(d);
 
-    Console::log("{}{}{}\n", Console::green, arr.contains(a), Console::reset);
+    arr.removeAt(0);
+
+    Console::log("{}{}{}\n", Console::cyan, arr.contains(a), Console::reset);
 
     Any console = ReflectionFactory::createObject("ExplorerConsole");
     Any sh = ReflectionFactory::createObject("Circle");
@@ -313,6 +315,11 @@ int main(int argc, char** argv) {
 
     Console::log("{}\n", sh.get<Circle>()->get_area());
     Console::log("{} {}\n", g[0], g[1]);
+
+    Function<int()> func = [](){ return 5; };
+    ErasedFunction erased = func.erased();
+
+    Console::log("{}\n", func());
 
 	return 0;
 

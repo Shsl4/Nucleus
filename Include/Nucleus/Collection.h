@@ -62,11 +62,11 @@ namespace Nucleus {
 
         virtual bool removeAllOf(T const& element) = 0;
 
-        virtual bool contains(T const& element) = 0;
+        virtual bool contains(T const& element) const = 0;
 
         virtual void clear() = 0;
 
-        virtual bool isEmpty() = 0;
+        virtual bool isEmpty() const = 0;
 
         T& operator[](size_t index) const;
 
