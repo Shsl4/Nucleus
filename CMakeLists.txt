@@ -27,7 +27,7 @@ filterSources("${NUCELUS_HEADERS}")
 filterSources("${NUCELUS_INLINE}")
 
 set(NUCLEUS_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/Include/")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_executable(Nucleus ${NUCELUS_SOURCES} ${NUCELUS_HEADERS} ${NUCELUS_INLINE})
 target_include_directories(Nucleus PUBLIC ${NUCLEUS_INCLUDE})

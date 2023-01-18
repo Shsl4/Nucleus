@@ -148,6 +148,30 @@ namespace Nucleus {
 
     };
 
+    template<typename T, template <typename Tt> typename Y> requires HasFmt<T>::value
+    class Fmt<Y<T>> {
+
+    public:
+
+        static String format(Y<T> const& array) {
+            
+            String result = "[";
+            
+            using Iterator = typename Y<T>::Iterator;
+            using Type = typename Iterator::value_type;
+
+            for(size_t i = 0; i < array.size() - 1; ++i){
+                result += Fmt<Type>::format(array[i]) + ", ";
+            }
+            
+            result += Fmt<Type>::format(array[array.size() - 1]) + "]";
+            
+            return result;
+            
+        }
+
+    };
+
 }
 
 #endif

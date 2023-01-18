@@ -115,12 +115,12 @@ namespace Nucleus {
     }
 
     template<class T>
-    Collection<T *>::Iterator SmartArray<T>::begin() const {
+    typename Collection<T *>::Iterator SmartArray<T>::begin() const {
         return typename Super::Iterator(buffer);
     }
 
     template<class T>
-    Collection<T *>::Iterator SmartArray<T>::end() const {
+    typename Collection<T *>::Iterator SmartArray<T>::end() const {
         return typename Super::Iterator(buffer + size());
     }
 

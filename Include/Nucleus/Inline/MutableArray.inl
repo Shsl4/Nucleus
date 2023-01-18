@@ -237,8 +237,6 @@ namespace Nucleus {
 
         Allocator<T>::copy(array.buffer, array.buffer + array.count, buffer + index);
 
-        count += array.getCount();
-
         return *this;
 
     }
@@ -247,7 +245,7 @@ namespace Nucleus {
     typename MutableArray<T>::Iterator MutableArray<T>::begin() const { return Iterator(buffer); }
 
     template <typename T>
-    typename MutableArray<T>::Iterator MutableArray<T>::end() const { return Iterator(buffer + getCount()); }
+    typename MutableArray<T>::Iterator MutableArray<T>::end() const { return Iterator(buffer + size()); }
 
     template <typename T>
     void MutableArray<T>::checkSize(const size_t size) {

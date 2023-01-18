@@ -294,24 +294,24 @@ namespace Nucleus {
         return os << string.buffer;
     }
 
-    String operator+(const char *cStr, String const &string) {
+    inline String operator+(const char *cStr, String const &string) {
         String newString = cStr;
         return newString.addAll(string);
     }
 
-    String::Super::Iterator String::begin() const {
+    inline String::Super::Iterator String::begin() const {
         return Iterator(buffer);
     }
 
-    String::Super::Iterator String::end() const {
+    inline String::Super::Iterator String::end() const {
         return Iterator(buffer + count - 1);
     }
 
-    char &String::get(size_t index) const {
+    inline char &String::get(size_t index) const {
         return buffer[index];
     }
 
-    auto String::add(const char &element) -> decltype(*this)& {
+    inline auto String::add(const char &element) -> decltype(*this)& {
 
         if (!element) return *this;
 
@@ -321,7 +321,7 @@ namespace Nucleus {
 
     }
 
-    auto String::addAll(const Collection<char> &array) -> decltype(*this)& {
+    inline auto String::addAll(const Collection<char> &array) -> decltype(*this)& {
 
         extend(array.size());
 
@@ -333,7 +333,7 @@ namespace Nucleus {
 
     }
 
-    auto String::insert(const char &element, size_t index) -> decltype(*this)& {
+    inline auto String::insert(const char &element, size_t index) -> decltype(*this)& {
 
         if (!element) return *this;
 
@@ -352,14 +352,14 @@ namespace Nucleus {
 
     }
 
-    auto String::insertAll(const Collection<char> &array, size_t index) -> decltype(*this)& {
+    inline auto String::insertAll(const Collection<char> &array, size_t index) -> decltype(*this)& {
 
         return insertAll(array.begin().get(), index);
 
     }
 
 
-    String& String::insertAll(const char *string, size_t index) {
+    inline String& String::insertAll(const char *string, size_t index) {
 
         const size_t stringSize = strlen(string);
 
@@ -380,7 +380,7 @@ namespace Nucleus {
 
     }
 
-    bool String::removeAt(size_t index) {
+    inline bool String::removeAt(size_t index) {
 
         if (index > size()) return false;
 
@@ -392,7 +392,7 @@ namespace Nucleus {
 
     }
 
-    bool String::removeAllOf(const char &element) {
+    inline bool String::removeAllOf(const char &element) {
 
         bool r = false;
 
@@ -409,7 +409,7 @@ namespace Nucleus {
 
     }
 
-    bool String::contains(const char &element) const {
+    inline bool String::contains(const char &element) const {
 
         for(auto& c : *this) {
             if(c == element) return true;
@@ -419,9 +419,9 @@ namespace Nucleus {
 
     }
 
-    bool String::isEmpty() const { return count == 0; }
+    inline bool String::isEmpty() const { return count == 0; }
 
-    size_t String::capacity() const { return storage; }
+    inline size_t String::capacity() const { return storage; }
 
 }
 

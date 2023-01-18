@@ -157,7 +157,7 @@ void mutableArrayTest() {
 
 	std::cout << std::endl;
 
-	std::cout << ok.getCount() << " " << ok.getCapacity() << std::endl;
+	std::cout << ok.size() << " " << ok.getCapacity() << std::endl;
 
 }
 
@@ -180,7 +180,7 @@ void test() {
 		std::cout << e << std::endl;
 	}
 
-	std::cout << "Array size: " << c.getCount() << std::endl;
+	std::cout << "Array size: " << c.size() << std::endl;
 
 }
 
@@ -308,7 +308,11 @@ int main(int argc, char** argv) {
     Any sh = ReflectionFactory::createObject("Circle");
     Any arr2 = ReflectionFactory::createObject("SmartArray<int>");
     Any str = ReflectionFactory::createObject("String");
+    
+    *str.get<String>() = "Hello";
 
+    Console::log("{}\n", str.get<String>());
+    
     auto& g = *arr2.get<SmartArray<int>>();
 
     g.add(new int(5)).add(new int(2));
@@ -318,8 +322,10 @@ int main(int argc, char** argv) {
 
     Function<int()> func = [](){ return 5; };
     ErasedFunction erased = func.erased();
-
-    Console::log("{}\n", func());
+    auto ch = Child("Hi");
+    Function<void((Child::*)(void))> fun = &Child::test;
+    fun.invokeWith(ch);
+    Console::log("{2}\n", erased.invoke<int>(), 8, 9);
 
 	return 0;
 

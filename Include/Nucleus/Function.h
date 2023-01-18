@@ -81,7 +81,6 @@ namespace Nucleus {
         using FunctionType = ReturnType(Class::*)(Args...);
 
         FunctionType func = nullptr;
-
         Class* target = nullptr;
 
     public:
@@ -112,6 +111,10 @@ namespace Nucleus {
         ReturnType invokeWith(Class* object, Args&&... args){
             nassertf(object, "Trying to invoke a function with an invalid object");
             return (object->*func)(std::forward<Args>(args)...);
+        }
+
+        ReturnType invokeWith(Class& object, Args&&... args){
+            return (object.*func)(std::forward<Args>(args)...);
         }
 
     };

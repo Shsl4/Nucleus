@@ -93,7 +93,7 @@ namespace Nucleus {
 
         bool removeAllOf(T const& value);
 
-        virtual FORCEINLINE size_t getCount() const { return count; }
+        virtual FORCEINLINE size_t size() const { return count; }
 
         FORCEINLINE size_t getCapacity() const { return capacity; }
 

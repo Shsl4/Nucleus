@@ -109,7 +109,7 @@ namespace Nucleus {
         // If no matching function is found, T must implement a formatter.
         expand(arguments, args...);
         
-        if(arguments.getCount() == 0) return fmt;
+        if(arguments.size() == 0) return fmt;
 
         String formatted(fmt.size());
 
@@ -133,7 +133,7 @@ namespace Nucleus {
 
                 if(last == i) {
                     
-                    if (nextArg >= arguments.getCount()){
+                    if (nextArg >= arguments.size()){
                         throw Exceptions::BadFormat("Uneven formatting braces / Argument count.");
                     }
 
@@ -154,7 +154,7 @@ namespace Nucleus {
                         
                         const size_t index = fmt.substring(last, i).toInteger();
                         
-                        if(index >= arguments.getCount()){
+                        if(index >= arguments.size()){
                             throw Exceptions::BadFormat("Argument index out of range.");
                         }
 
@@ -229,7 +229,7 @@ namespace Nucleus {
     template <typename T>
     String String::fromPointer(const T* pointer) {
 
-        if(!pointer) { return format("nullptr ({}*)", Type::name<T>()); }
+        if(!pointer) { return "nullptr"; }
             
         const auto address = reinterpret_cast<intptr_t>(pointer);
             
@@ -240,7 +240,7 @@ namespace Nucleus {
             
         const String strAddress(buf, strlen(buf));
             
-        return format("0x{} ({}*)", strAddress, Type::name<T>());
+        return "0x" + strAddress;
             
     }
 
