@@ -3,7 +3,7 @@
 #ifdef ARRAY_INLINE
 
 #include <Nucleus/Exceptions.h>
-#include <Nucleus/String.h>
+#include <Nucleus/Random.h>
 
 namespace Nucleus {
 
@@ -31,6 +31,15 @@ namespace Nucleus {
     template<class T>
     T &Collection<T>::operator[](size_t index) const {
         return get(index);
+    }
+
+    template<class T>
+    void Collection<T>::randomize() {
+
+        for (size_t i = 0; i < size(); ++i) {
+            Allocator<T>::swap(get(i), get(Nucleus::Random::randomInteger<size_t>(0, size() - 1)));
+        }
+
     }
 
 }

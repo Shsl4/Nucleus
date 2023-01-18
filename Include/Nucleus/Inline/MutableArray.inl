@@ -1,300 +1,244 @@
 #pragma once
 
-#include <Nucleus/Exceptions.h>
-
 #ifdef MUTABLE_INLINE
 
-#include <Nucleus/ImmutableArray.h>
+#include <Nucleus/Exceptions.h>
+#include <Nucleus/String.h>
 
 namespace Nucleus {
 
-    template <typename T>
-    MutableArray<T>::~MutableArray() {
-
-        this->count = 0;
-        this->capacity = 0;
-        Allocator<T>::release(buffer);
-
-    }
-
-    template <typename T>
-    MutableArray<T>::MutableArray(size_t cap): capacity(cap) {
-        this->buffer = Allocator<T>::allocate(capacity);
-    }
-
-    template <typename T>
-    MutableArray<T>::MutableArray(std::initializer_list<T> list) {
-
-        this->capacity = list.size();
-        this->count = list.size();
-        this->buffer = Allocator<T>::allocate(capacity);
-        Allocator<T>::copy(list.begin(), list.end(), buffer);
-
-    }
-
-    template <typename T>
-    MutableArray<T>::MutableArray(T* buf, size_t size) : count(buf ? size : 0), capacity(count) {
-
-        if(!buf) { return; }
-
-        this->buffer = Allocator<T>::allocate(size);
-
-        Allocator<T>::copy(buf, buf + size, this->buffer);
-            
-    }
-
-    template <typename T>
-    MutableArray<T>::MutableArray(MutableArray const& other) {
+    template<class T>
+    MutableArray<T>::MutableArray(MutableArray&& other) noexcept {
         *this = other;
     }
 
-    template <typename T>
-    MutableArray<T>::MutableArray(MutableArray&& other) noexcept {
+    template<class T>
+    MutableArray<T>::MutableArray(const MutableArray &other) {
         *this = std::move(other);
     }
 
-    template <typename T>
-    T& MutableArray<T>::operator[](size_t index) {
-        if(index >= count) throw Exceptions::OutOfRange("MutableArray index out of range");
-        return buffer[index];
-    }
 
-    template <typename T>
-    T& MutableArray<T>::operator[](size_t index) const {
-        if(index >= count) throw Exceptions::OutOfRange("MutableArray index out of range");
-        return buffer[index];
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::operator+=(T const& element) {
-        return append(element);
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::operator+=(MutableArray const& array) {
-        return append(array);
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::operator+=(T&& element) {
-        return append(std::move(element));
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::operator=(MutableArray const& other) {
-
-        if(&other == this) return *this;
-        
-        const T* start = other.begin().get();
-
-        if (start == nullptr) {
-            this->count = 0;
-            this->capacity = 0;
-            return *this;
-        }
-
-        Allocator<T>::reallocate(buffer, capacity, other.capacity);
-        Allocator<T>::copy(start, start + other.capacity, buffer);
-
-        this->count = other.count;
-        this->capacity = other.capacity;
-        return *this;
-            
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::operator=(MutableArray&& other) noexcept {
+    template<class T>
+    MutableArray<T>& MutableArray<T>::operator=(MutableArray &&other) noexcept {
 
         if(&other == this) return *this;
 
         Allocator<T>::release(buffer);
 
         this->buffer = other.buffer;
-        this->count = other.count;
-        this->capacity = other.capacity;
+        this->bufferSize = other.bufferSize;
+        this->bufferCapacity = other.bufferCapacity;
 
         other.buffer = nullptr;
-        other.count = 0;
-        other.capacity = 0;
-            
-        return *this;
-            
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::append(T const& element) {
-
-        checkSize();
-        buffer[count] = element;
-        ++count;
-        return *this;
-
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::append(T&& element) {
-
-        checkSize();
-        buffer[count] = std::move(element);
-        ++count;
-        return *this;
-
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::append(MutableArray const& array) {
-
-        checkSize(array.count);
-
-        Allocator<T>::copy(array.buffer, array.buffer + array.count, buffer + count);
-
-        count += array.count;
+        other.bufferSize = 0;
+        other.bufferCapacity = 0;
 
         return *this;
 
     }
 
-    template <typename T>
+    template<class T>
+    MutableArray<T>& MutableArray<T>::operator=(const MutableArray &other) {
+
+        if(&other == this) return *this;
+
+        const T* start = other.begin().get();
+
+        if (start == nullptr) {
+            this->bufferSize = 0;
+            this->bufferCapacity = 0;
+            return *this;
+        }
+
+        Allocator<T>::reallocate(buffer, bufferCapacity, other.bufferCapacity);
+        Allocator<T>::copy(start, start + other.bufferCapacity, buffer);
+
+        this->bufferSize = other.bufferSize;
+        this->bufferCapacity = other.bufferCapacity;
+
+        return *this;
+
+    }
+
+    template<class T>
+    MutableArray<T>::MutableArray(size_t size) {
+
+        this->buffer = Allocator<T>::allocate(size);
+        this->bufferSize = 0;
+        this->bufferCapacity = size;
+
+    }
+
+    template<class T>
+    void MutableArray<T>::extend(const size_t size) {
+
+        if(bufferSize + size > bufferCapacity){
+
+            const size_t newSize = bufferCapacity > 0 ? bufferCapacity * 2 : size;
+            Allocator<T>::reallocate(buffer, bufferCapacity, newSize);
+            bufferCapacity = newSize;
+
+        }
+
+    }
+
+    template<class T>
+    bool MutableArray<T>::isEmpty() const {
+        return bufferSize == 0;
+    }
+
+    template<class T>
+    void MutableArray<T>::clear() {
+
+        Allocator<T>::release(buffer);
+
+        this->bufferSize = 0;
+        this->bufferCapacity = 0;
+
+    }
+
+    template<class T>
+    bool MutableArray<T>::contains(const T &element) const {
+
+        for (size_t i = 0; i < bufferSize; ++i) {
+            if (buffer[i] == element) return true;
+        }
+
+        return false;
+
+    }
+
+    template<class T>
+    bool MutableArray<T>::removeAllOf(const T &element) {
+
+        bool r = false;
+
+        for(size_t i = 0; i < size(); ++i){
+
+            if (buffer[i] == element){
+                removeAt(i--);
+                r = true;
+            }
+
+        }
+
+        return r;
+
+    }
+
+    template<class T>
     bool MutableArray<T>::removeAt(size_t index) {
 
-        if (index >= count) return false;
+        if (index > size()) return false;
 
-        Allocator<T>::move(buffer + index + 1, buffer + count, buffer + index);
+        Allocator<T>::move(buffer + index + 1, buffer + bufferSize, buffer + index);
 
-        --count;
+        --bufferSize;
 
         return true;
 
     }
 
-    template <typename T>
-    bool MutableArray<T>::removeAllOf(T const& value) {
+    template<class T>
+    auto MutableArray<T>::insertAll(const Collection<T> &array, size_t index) -> decltype(*this) & {
 
-        bool removed = false;
+        if (index >= bufferSize) {
+            return addAll(array);
+        }
 
-        for (size_t index = count; index > 0; --index) {
+        extend(array.size());
 
-            if(buffer[index - 1] == value){
-                Allocator<T>::move(buffer + index, buffer + count, buffer + index - 1);
-                removed = true;
-                --count;
-            }
+        Allocator<T>::move(buffer + index, buffer + bufferSize, buffer + index + array.size() + 1);
+
+        for(T const& element : array){
+
+            buffer[index++] = element;
+            ++bufferSize;
 
         }
 
-        return removed;
+        return *this;
 
     }
 
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::insert(T const& element, size_t index) {
+    template<class T>
+    auto MutableArray<T>::insert(const T &element, size_t index) -> decltype(*this) & {
 
-        if (index >= count) {
-            return append(element);
+        if (index >= bufferSize) {
+            return add(element);
         }
 
-        checkSize();
+        extend();
 
-        Allocator<T>::move(buffer + index, buffer + count, buffer + index + 1);
+        Allocator<T>::move(buffer + index, buffer + bufferSize, buffer + index + 1);
 
         buffer[index] = element;
-
-        ++count;
-
-        return *this;
-
-    }
-
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::insert(T&& element, size_t index) {
-
-        if (index >= count) {
-            return append(element);
-        }
-
-        checkSize();
-
-        Allocator<T>::move(buffer + index, buffer + count, buffer + index + 1);
-
-        buffer[index] = std::move(element);
-
-        ++count;
+        ++bufferSize;
 
         return *this;
 
     }
 
-    template <typename T>
-    MutableArray<T>& MutableArray<T>::insert(MutableArray const& array, size_t index) {
+    template<class T>
+    auto MutableArray<T>::addAll(const Collection<T> &array) -> decltype(*this) & {
 
-        if (index >= count) {
-            return append(array);
+        extend(array.size());
+
+        for(T const& element : array){
+            buffer[bufferSize++] = element;
         }
-
-        checkSize(array.count);
-
-        Allocator<T>::move(buffer + index, buffer + count, buffer + index + array.count);
-
-        Allocator<T>::copy(array.buffer, array.buffer + array.count, buffer + index);
 
         return *this;
 
     }
 
-    template <typename T>
-    typename MutableArray<T>::Iterator MutableArray<T>::begin() const { return Iterator(buffer); }
+    template<class T>
+    auto MutableArray<T>::add(const T &element) -> decltype(*this) & {
 
-    template <typename T>
-    typename MutableArray<T>::Iterator MutableArray<T>::end() const { return Iterator(buffer + size()); }
+        extend();
+        buffer[bufferSize++] = element;
+        return *this;
 
-    template <typename T>
-    void MutableArray<T>::checkSize(const size_t size) {
+    }
 
-        if(count + size > capacity){
-                
-            const size_t newSize = capacity > 0 ? capacity * 2 : size;
-            Allocator<T>::reallocate(buffer, capacity, newSize);
-            capacity = newSize;
-                
+    template<class T>
+    T &MutableArray<T>::get(size_t index) const {
+        nassert(index < bufferSize);
+        return buffer[index];
+    }
+
+    template<class T>
+    size_t MutableArray<T>::size() const {
+        return bufferSize;
+    }
+
+    template<class T>
+    typename Collection<T>::Iterator MutableArray<T>::end() const {
+        return typename Super::Iterator(buffer + size());
+    }
+
+    template<class T>
+    typename Collection<T>::Iterator MutableArray<T>::begin() const {
+        return typename Super::Iterator(buffer);
+    }
+
+    template<class T>
+    size_t MutableArray<T>::capacity() const {
+        return bufferCapacity;
+    }
+
+    template<class T>
+    MutableArray<T>::MutableArray(std::initializer_list<T> list) {
+
+        this->buffer = Allocator<T>::allocate(list.size());
+        this->bufferSize = list.size();
+        this->bufferCapacity = list.size();
+
+        for (T const& element : list) {
+            add(element);
         }
 
     }
-
-    template <typename T>
-    ImmutableArray<T> MutableArray<T>::toImmutable() const {
-
-        return ImmutableArray<T>(buffer, count);
-        
-    }
-
-    template <typename T>
-    void MutableArray<T>::reset() {
-        this->count = 0;
-    }
-
-    template <typename T>
-    MutableArray<T>::Iterator::Iterator(pointer ptr): ptr(ptr) {
-
-    }
-
-    template <typename T>
-    typename MutableArray<T>::Iterator::reference MutableArray<T>::Iterator::operator*() const {
-        return *ptr;
-    }
-
-    template <typename T>
-    typename MutableArray<T>::Iterator::pointer MutableArray<T>::Iterator::operator->() {
-        return ptr;
-    }
-
-    template <typename T>
-    typename MutableArray<T>::Iterator::pointer MutableArray<T>::Iterator::get() {
-        return ptr;
-    }
-
-    template <typename T>
-    typename MutableArray<T>::Iterator::reference MutableArray<T>::Iterator::operator++() { ++ptr; return *ptr; }
-    
 }
 
 #endif

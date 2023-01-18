@@ -3,7 +3,6 @@
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/Allocator.h>
 #include <Nucleus/Exceptions.h>
-#include <Nucleus/String.h>
 #include <Nucleus/Type.h>
 
 namespace Nucleus {
@@ -49,8 +48,6 @@ namespace Nucleus {
         FORCEINLINE T* pointer() { assertValid(); return object; }
                 
         FORCEINLINE T* pointer() const { assertValid(); return object; }
-        
-        String getClass() const;
 
         FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
         

@@ -6,8 +6,6 @@
 #include <string>
 #include <cstring>
 
-#include <Nucleus/CoreMacros.h>
-#include <Nucleus/Allocator.h>
 #include <Nucleus/MutableArray.h>
 
 namespace Nucleus {

@@ -40,6 +40,14 @@ namespace Nucleus {
             moveBack(from, to, dest);
             
         }
+
+        static FORCEINLINE void swap(T& a, T& b){
+
+            T storage = std::move(a);
+            a = std::move(b);
+            b = std::move(storage);
+
+        }
         
         static FORCEINLINE void copyBack(const T* from, const T* to, T* dest){
             

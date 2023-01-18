@@ -1,116 +1,70 @@
 #pragma once
 
-#include <Nucleus/CoreMacros.h>
-#include <Nucleus/Allocator.h>
-#include <iterator>
+#include <Nucleus/Collection.h>
 
 namespace Nucleus {
 
-    template<typename T>
-    class ImmutableArray;
-    
-    template<typename T>
-    class MutableArray {
-    
+    template<class T>
+    class MutableArray : public Collection<T>{
+
+        using Super = Collection<T>;
+
     public:
-
-        class Iterator {
-
-        public:
-
-            using iterator_category = std::forward_iterator_tag;
-            using difference_type   = std::ptrdiff_t;
-            using value_type        = T;
-            using pointer           = T*;
-            using reference         = T&;
-
-            explicit Iterator(pointer ptr);
-
-            reference operator*() const;
-
-            pointer operator->();
-
-            reference operator++();
-
-            pointer get();
-
-            friend bool operator==(const Iterator& a, const Iterator& b) { return a.ptr == b.ptr; }
-            friend bool operator!=(const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; }
-
-        private:
-
-            pointer ptr;
-
-        };
 
         MutableArray() = default;
 
-        virtual ~MutableArray();
-
-        explicit MutableArray(size_t cap);
-
-        MutableArray(std::initializer_list<T> list);
-
-        MutableArray(T* buf, size_t size);
+        explicit MutableArray(size_t size);
 
         MutableArray(MutableArray const& other);
 
         MutableArray(MutableArray&& other) noexcept;
 
-        T& operator[](size_t index);
+        MutableArray(std::initializer_list<T> list);
 
-        T& operator[](size_t index) const;
+        ~MutableArray() override = default;
 
-        virtual MutableArray& operator+=(T const& element);
+        typename Super::Iterator begin() const override;
 
-        virtual MutableArray& operator+=(MutableArray const& array);
+        typename Super::Iterator end() const override;
 
-        virtual MutableArray& operator+=(T&& element);
+        NODISCARD size_t size() const override;
+
+        NODISCARD size_t capacity() const override;
+
+        T &get(size_t index) const override;
+
+        auto add(const T &element) -> decltype(*this)& override;
+
+        auto addAll(const Collection<T> &array) -> decltype(*this)& override;
+
+        auto insert(const T &element, size_t index) -> decltype(*this)& override;
+
+        auto insertAll(const Collection<T> &array, size_t index) -> decltype(*this)& override;
+
+        bool removeAt(size_t index) override;
+
+        bool removeAllOf(const T &element) override;
+
+        bool contains(const T &element) const override;
+
+        void clear() override;
+
+        NODISCARD bool isEmpty() const override;
 
         MutableArray& operator=(MutableArray const& other);
 
         MutableArray& operator=(MutableArray&& other) noexcept;
 
-        MutableArray& append(T const& element);
+    private:
 
-        MutableArray& append(T&& element);
-
-        MutableArray& append(MutableArray const& array);
-
-        MutableArray& insert(T const& element, size_t index);
-
-        MutableArray& insert(T&& element, size_t index);
-
-        MutableArray& insert(MutableArray const& array, size_t index);
-
-        ImmutableArray<T> toImmutable() const;
-        
-        bool isEmpty() const { return this->count == 0; }
-
-        void reset();
-
-        bool removeAt(size_t index);
-
-        bool removeAllOf(T const& value);
-
-        virtual FORCEINLINE size_t size() const { return count; }
-
-        FORCEINLINE size_t getCapacity() const { return capacity; }
-
-        Iterator begin() const;
-
-        Iterator end() const;
-
-    protected:
-
-        void checkSize(size_t size = 1);
+        void extend(size_t size = 1);
 
         T* buffer = nullptr;
-        size_t count = 0;
-        size_t capacity = 0;
+        size_t bufferSize = 0;
+        size_t bufferCapacity = 0;
 
     };
-    
+
 }
 
 #define MUTABLE_INLINE

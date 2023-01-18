@@ -2,8 +2,6 @@
 
 #ifdef ALLOCATOR_INLINE
 
-#include <Nucleus/Console.h>
-
 namespace Nucleus {
 
     template <typename T>

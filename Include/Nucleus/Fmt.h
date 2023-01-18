@@ -2,7 +2,6 @@
 
 #include <charconv>
 #include <Nucleus/CoreMacros.h>
-#include <Nucleus/String.h>
 
 namespace Nucleus {
 

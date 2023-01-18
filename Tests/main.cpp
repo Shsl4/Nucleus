@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <concepts>
+#include "Nucleus/MutableArray.h"
 
 using namespace Nucleus;
 
@@ -138,7 +139,7 @@ void mutableArrayTest() {
 	MutableArray<int> ok(50);
 
 	for (int i = 0; i < 50; ++i) {
-		ok.append(randInt(0, 1));
+		ok.add(randInt(0, 1));
 	}
 
 	for (auto const& e : ok) {
@@ -147,7 +148,7 @@ void mutableArrayTest() {
 
 	std::cout << std::endl;
 
-	ok.insert(ok, 2);
+	ok.insertAll(ok, 2);
 	ok.removeAllOf(0);
 	ok.removeAllOf(1);
 
@@ -157,7 +158,7 @@ void mutableArrayTest() {
 
 	std::cout << std::endl;
 
-	std::cout << ok.size() << " " << ok.getCapacity() << std::endl;
+	std::cout << ok.size() << " " << ok.capacity() << std::endl;
 
 }
 
@@ -173,7 +174,7 @@ void test() {
 	c += 5;
 
 	for (int i = 0; i < 500; ++i) {
-		c.append(randInt(0, 30));
+		c.add(randInt(0, 30));
 	}
 
 	for (auto const& e : c) {
@@ -322,10 +323,23 @@ int main(int argc, char** argv) {
 
     Function<int()> func = [](){ return 5; };
     ErasedFunction erased = func.erased();
+
     auto ch = Child("Hi");
-    Function<void((Child::*)(void))> fun = &Child::test;
+
+    Function<void(Child::*)(void)> fun = &Child::test;
     fun.invokeWith(ch);
+
     Console::log("{2}\n", erased.invoke<int>(), 8, 9);
+
+    MutableArray<int> myIntArray;
+
+    myIntArray += { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    myIntArray -= { 6, 3 };
+
+    myIntArray.randomize();
+
+    Console::log("{}\n", myIntArray);
 
 	return 0;
 

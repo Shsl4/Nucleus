@@ -108,7 +108,7 @@ namespace Nucleus {
         
         // If no matching function is found, T must implement a formatter.
         expand(arguments, args...);
-        
+
         if(arguments.size() == 0) return fmt;
 
         String formatted(fmt.size());

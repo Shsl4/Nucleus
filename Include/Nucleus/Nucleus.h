@@ -20,6 +20,7 @@
 #include <Nucleus/Map.h>
 
 #include <Nucleus/Optional.h>
+#include <Nucleus/Random.h>
 #include <Nucleus/Any.h>
 
 #include <Nucleus/Console.h>

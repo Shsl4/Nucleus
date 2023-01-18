@@ -3,7 +3,6 @@
 #ifdef STRING_INLINE
 
 #include <Nucleus/Shared.h>
-#include "Nucleus/String.h"
 
 namespace Nucleus {
 

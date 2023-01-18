@@ -20,11 +20,6 @@ namespace Nucleus{
     T *Unique<T>::operator->() const { assertValid(); return object; }
 
     template<typename T>
-    String Unique<T>::getClass() const {
-        return isValid() ? Type::name(*object) : "nullptr";
-    }
-
-    template<typename T>
     Unique<T>& Unique<T>::operator=(Unique &&other) noexcept {
 
         if(&other == this) return *this;

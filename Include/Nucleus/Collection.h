@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Nucleus/Nucleus.h>
+#include <Nucleus/CoreMacros.h>
 
 namespace Nucleus {
 
@@ -38,6 +38,8 @@ namespace Nucleus {
 
         };
 
+        Collection() = default;
+
         virtual ~Collection() = default;
 
         virtual Iterator begin() const = 0;
@@ -66,7 +68,9 @@ namespace Nucleus {
 
         virtual void clear() = 0;
 
-        virtual bool isEmpty() const = 0;
+        NODISCARD virtual bool isEmpty() const = 0;
+
+        void randomize();
 
         T& operator[](size_t index) const;
 
@@ -74,10 +78,34 @@ namespace Nucleus {
             return collection.add(element);
         }
 
+        friend Collection& operator+=(Collection& collection, Collection const& other){
+            return collection.addAll(other);
+        }
+
+        friend Collection& operator+=(Collection& collection, std::initializer_list<T> const& list){
+
+            for (T const& element : list) {
+                collection.add(element);
+            }
+
+            return collection;
+
+        }
+
+        friend Collection& operator-=(Collection& collection, std::initializer_list<T> const& list){
+
+            for (T const& element : list) {
+                collection.removeAllOf(element);
+            }
+
+            return collection;
+
+        }
+
     };
 
 }
 
 #define ARRAY_INLINE
-#include <Nucleus/Inline/Array.inl>
+#include <Nucleus/Inline/Collection.inl>
 #undef ARRAY_INLINE

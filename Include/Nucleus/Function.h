@@ -76,7 +76,7 @@ namespace Nucleus {
 
 
     template<class Class, typename ReturnType, typename... Args>
-    class Function<ReturnType((Class::*)(Args...))>{
+    class Function<ReturnType(Class::*)(Args...)>{
 
         using FunctionType = ReturnType(Class::*)(Args...);
 
