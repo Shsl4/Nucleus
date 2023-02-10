@@ -63,10 +63,7 @@ namespace Nucleus{
 #ifdef __GNUG__
         return demangle(className);
 #else
-        auto str = String(className);
-        str.removeOccurrences("class ");
-        str.removeOccurrences("struct ");
-        return str;
+        return String(className).removeOccurrences("class ").removeOccurrences("struct ");
 #endif
 
     }

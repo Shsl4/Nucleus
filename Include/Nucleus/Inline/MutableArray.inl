@@ -109,7 +109,7 @@ namespace Nucleus {
     }
 
     template<class T>
-    bool MutableArray<T>::removeAllOf(const T &element) {
+    bool MutableArray<T>::remove(const T &element) {
 
         bool r = false;
 
@@ -140,17 +140,17 @@ namespace Nucleus {
     }
 
     template<class T>
-    auto MutableArray<T>::insertAll(const Collection<T> &array, size_t index) -> decltype(*this) & {
+    auto MutableArray<T>::insertAll(const Collection<T> &collection, size_t index) -> decltype(*this) & {
 
         if (index >= bufferSize) {
-            return addAll(array);
+            return addAll(collection);
         }
 
-        extend(array.size());
+        extend(collection.size());
 
-        Allocator<T>::move(buffer + index, buffer + bufferSize, buffer + index + array.size() + 1);
+        Allocator<T>::move(buffer + index, buffer + bufferSize, buffer + index + collection.size() + 1);
 
-        for(T const& element : array){
+        for(T const& element : collection){
 
             buffer[index++] = element;
             ++bufferSize;
@@ -180,11 +180,11 @@ namespace Nucleus {
     }
 
     template<class T>
-    auto MutableArray<T>::addAll(const Collection<T> &array) -> decltype(*this) & {
+    auto MutableArray<T>::addAll(const Collection<T> &collection) -> decltype(*this) & {
 
-        extend(array.size());
+        extend(collection.size());
 
-        for(T const& element : array){
+        for(T const& element : collection){
             buffer[bufferSize++] = element;
         }
 
@@ -239,6 +239,19 @@ namespace Nucleus {
         }
 
     }
+
+
+    template<class T>
+    auto MutableArray<T>::removeAll(const Collection<T> &collection) -> decltype(*this) & {
+
+        for(auto const& e : collection){
+            remove(e);
+        }
+
+        return *this;
+    }
+
+
 }
 
 #endif

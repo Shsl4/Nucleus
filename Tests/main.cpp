@@ -149,8 +149,8 @@ void mutableArrayTest() {
 	std::cout << std::endl;
 
 	ok.insertAll(ok, 2);
-	ok.removeAllOf(0);
-	ok.removeAllOf(1);
+    ok.remove(0);
+    ok.remove(1);
 
 	for (auto const& e : ok) {
 		std::cout << e << " ";
@@ -333,13 +333,20 @@ int main(int argc, char** argv) {
 
     MutableArray<int> myIntArray;
 
-    myIntArray += { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    auto& ww = myIntArray += { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-    myIntArray -= { 6, 3 };
+    auto e = myIntArray -= { 6, 3 };
 
-    myIntArray.randomize();
+    myIntArray -= myIntArray;
+
+    auto w = myIntArray + 6;
+
+    w += { 1, 2, 3, 4, 5 };
+
+    w.randomize();
 
     Console::log("{}\n", myIntArray);
+    Console::log("{}\n", w);
 
 	return 0;
 

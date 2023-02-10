@@ -42,15 +42,17 @@ namespace Nucleus {
 
         auto add(const char &element) -> decltype(*this) & override;
 
-        auto addAll(const Collection<char> &array) -> decltype(*this) & override;
+        auto addAll(const Collection<char> &collection) -> decltype(*this) & override;
 
         auto insert(const char &element, size_t index) -> decltype(*this) & override;
 
-        auto insertAll(const Collection<char> &array, size_t index) -> decltype(*this) & override;
+        auto insertAll(const Collection<char> &collection, size_t index) -> decltype(*this) & override;
 
         bool removeAt(size_t index) override;
 
-        bool removeAllOf(const char &element) override;
+        bool remove(const char &element) override;
+
+        auto removeAll(const Collection<char> &collection) -> decltype(*this) & override;
 
         bool operator==(String const& other) const;
 
@@ -60,7 +62,7 @@ namespace Nucleus {
 
         void clear() override;
 
-        void removeOccurrences(String const& other);
+        String& removeOccurrences(String const& other);
         
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);

@@ -215,7 +215,7 @@ namespace Nucleus {
         
     }
 
-    inline void String::removeOccurrences(String const& other) {
+    inline String& String::removeOccurrences(String const& other) {
             
         const size_t size = this->size();
         const size_t otherSize = other.size();
@@ -247,6 +247,8 @@ namespace Nucleus {
             ++i;
                 
         }
+
+        return *this;
             
     }
 
@@ -320,13 +322,13 @@ namespace Nucleus {
 
     }
 
-    inline auto String::addAll(const Collection<char> &array) -> decltype(*this)& {
+    inline auto String::addAll(const Collection<char> &collection) -> decltype(*this)& {
 
-        extend(array.size());
+        extend(collection.size());
 
-        Allocator<char>::copy(array.begin().get(), array.end().get(), buffer + size());
+        Allocator<char>::copy(collection.begin().get(), collection.end().get(), buffer + size());
 
-        this->count += array.size();
+        this->count += collection.size();
 
         return *this;
 
@@ -351,9 +353,9 @@ namespace Nucleus {
 
     }
 
-    inline auto String::insertAll(const Collection<char> &array, size_t index) -> decltype(*this)& {
+    inline auto String::insertAll(const Collection<char> &collection, size_t index) -> decltype(*this)& {
 
-        return insertAll(array.begin().get(), index);
+        return insertAll(collection.begin().get(), index);
 
     }
 
@@ -391,7 +393,7 @@ namespace Nucleus {
 
     }
 
-    inline bool String::removeAllOf(const char &element) {
+    inline bool String::remove(const char &element) {
 
         bool r = false;
 
@@ -406,6 +408,16 @@ namespace Nucleus {
 
         return r;
 
+    }
+
+
+    inline auto String::removeAll(const Collection<char> &collection) -> decltype(*this)& {
+
+        for(auto const& e : collection){
+            remove(e);
+        }
+
+        return *this;
     }
 
     inline bool String::contains(const char &element) const {

@@ -44,7 +44,9 @@ namespace Nucleus {
 
         bool removeAt(size_t index) override;
 
-        bool removeAllOf(T *const &element) override;
+        auto removeAll(const Collection<T *> &collection) -> decltype(*this) & override;
+
+        bool remove(T *const &element) override;
 
         bool contains(T *const &element) const override;
 

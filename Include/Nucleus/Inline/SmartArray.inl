@@ -222,7 +222,7 @@ namespace Nucleus {
     }
 
     template<class T>
-    bool SmartArray<T>::removeAllOf(T *const &element) {
+    bool SmartArray<T>::remove(T *const &element) {
 
         bool r = false;
 
@@ -236,6 +236,17 @@ namespace Nucleus {
         }
 
         return r;
+
+    }
+
+    template<class T>
+    auto SmartArray<T>::removeAll(const Collection<T *> &collection) -> decltype(*this) & {
+
+        for(auto const& e : collection){
+            remove(e);
+        }
+
+        return *this;
 
     }
 

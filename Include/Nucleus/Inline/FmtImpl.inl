@@ -154,7 +154,9 @@ namespace Nucleus {
     public:
 
         static String format(Y<T> const& array) {
-            
+
+            if (array.isEmpty()) return "[]";
+
             String result = "[";
             
             using Iterator = typename Y<T>::Iterator;

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef ARRAY_INLINE
+#ifdef COLLECTION_INLINE
 
 #include <Nucleus/Exceptions.h>
 #include <Nucleus/Random.h>

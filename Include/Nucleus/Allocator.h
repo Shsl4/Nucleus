@@ -21,9 +21,7 @@ namespace Nucleus {
         static void reallocate(T*& ptr, size_t oldSize, size_t newSize);
 
         static FORCEINLINE void moveBack(T* from, T* to, T* dest){
-            
             while(from != to) { *dest++ = std::move(*from++); }
-            
         }
         
         static FORCEINLINE void moveForward(T* from, T* to, T* dest){
@@ -50,9 +48,7 @@ namespace Nucleus {
         }
         
         static FORCEINLINE void copyBack(const T* from, const T* to, T* dest){
-            
             while(from != to) { *dest++ = *from++; }
-            
         }
         
         static FORCEINLINE void copyForward(const T* from, const T* to, T* dest){

@@ -35,15 +35,17 @@ namespace Nucleus {
 
         auto add(const T &element) -> decltype(*this)& override;
 
-        auto addAll(const Collection<T> &array) -> decltype(*this)& override;
+        auto addAll(const Collection<T> &collection) -> decltype(*this)& override;
 
         auto insert(const T &element, size_t index) -> decltype(*this)& override;
 
-        auto insertAll(const Collection<T> &array, size_t index) -> decltype(*this)& override;
+        auto insertAll(const Collection<T> &collection, size_t index) -> decltype(*this)& override;
 
         bool removeAt(size_t index) override;
 
-        bool removeAllOf(const T &element) override;
+        bool remove(const T &element) override;
+
+        auto removeAll(const Collection<T> &collection) -> decltype(*this)& override;
 
         bool contains(const T &element) const override;
 
