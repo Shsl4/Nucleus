@@ -20,6 +20,12 @@ namespace Nucleus {
 
         }
 
+        template<typename T>
+        Any& operator=(T const& other){
+            pointer = Shared<Derived<T>>::make(other);
+            return *this;
+        }
+
         static Any empty() { return {}; }
 
         template <typename T>
@@ -29,24 +35,24 @@ namespace Nucleus {
         }
 
         template <typename T>
-        T* get() {
+        T& get() {
 
-            if (isOfType<T>()) {
-                return static_cast<T*>(pointer.pointer()->getValue());
+            if (!isOfType<T>()) {
+                throw Exceptions::BadType("Bad get type");
             }
 
-            return nullptr;
+            return *static_cast<T*>(pointer.pointer()->getValue());
 
         }
 
         template <typename T>
-        T const* get() const {
+        T const& get() const {
 
-            if (isOfType<T>()) {
-                return static_cast<T*>(pointer.pointer()->getValue());
+            if (!isOfType<T>()) {
+                throw Exceptions::BadType("Bad get type");
             }
 
-            return nullptr;
+            return static_cast<T*>(pointer.pointer()->getValue());
 
         }
 

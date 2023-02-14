@@ -1,66 +1,118 @@
 #pragma once
 
-#include <Nucleus/Allocator.h>
+#include <Nucleus/Collection.h>
 
 namespace Nucleus {
     
-    template<typename T, size_t size>
-    class StaticArray {
-        
+    template<typename T, size_t sz>
+    class StaticArray : public Collection<T> {
+
+        using Super = Collection<T>;
+
     public:
         
         StaticArray() = default;
 
-        StaticArray(StaticArray<T, size> const& other){
+        StaticArray(std::initializer_list<T> const& list){
 
-            Allocator<T>::copy(other.buffer, other.buffer + size, this->buffer);
+            ensure(list.size() <= sz, "Initializer list size exceeds maximal array size");
+            Allocator<T>::copy(list.begin(), list.end(), this->buffer);
 
         }
 
-        StaticArray(StaticArray<T, size>&& other) noexcept {
+        StaticArray(StaticArray<T, sz> const& other){
+
+            Allocator<T>::copy(other.buffer, other.buffer + sz, this->buffer);
+
+        }
+
+        StaticArray(StaticArray<T, sz>&& other) noexcept {
             
-            Allocator<T>::move(other.buffer, other.buffer + size, this->buffer);
+            Allocator<T>::move(other.buffer, other.buffer + sz, this->buffer);
             
         }
 
-        StaticArray<T, size>& operator=(StaticArray<T, size> const& other) {
+        StaticArray<T, sz>& operator=(StaticArray<T, sz> const& other) {
 
             if(&other == this) return *this;
 
-            Allocator<T>::copy(other.begin(), other.begin() + size, buffer);
+            Allocator<T>::copy(other.begin(), other.begin() + sz, buffer);
 
             return *this;
 
         }
 
-        StaticArray<T, size>& operator=(StaticArray<T, size>&& other) noexcept {
+        StaticArray<T, sz>& operator=(StaticArray<T, sz>&& other) noexcept {
 
             if(&other == this) return *this;
 
-            Allocator<T>::move(other.begin(), other.begin() + size, buffer);
+            Allocator<T>::move(other.begin(), other.begin() + sz, buffer);
 
             return *this;
 
         }
         
         ~StaticArray() = default;
-        
-        FORCEINLINE static size_t getSize() noexcept { return size; }
-        
-        T& operator[](size_t index){
-            
-            assert(index < size);
-            return buffer[index];
-            
+
+        NODISCARD size_t size() const override { return sz; }
+
+        NODISCARD size_t capacity() const override { return sz; }
+
+        NODISCARD bool isEmpty() const override { return false; }
+
+        NODISCARD T &get(size_t index) const override { assert(index < sz); return *(const_cast<T*>(buffer) + index); }
+
+        auto add(const T&) -> decltype(*this) & override {
+            throw Exceptions::UnsupportedOperation("Unsupported operation add() on StaticArray");
         }
-        
-        T* begin() const { return const_cast<T*>(buffer); }
-        
-        T* end() const { return const_cast<T*>(buffer + size); }
-        
+
+        auto addAll(const Collection<T>&) -> decltype(*this) & override {
+            throw Exceptions::UnsupportedOperation("Unsupported operation addAll() on StaticArray");
+        }
+
+        auto insert(const T&, size_t) -> decltype(*this) & override {
+            throw Exceptions::UnsupportedOperation("Unsupported operation insert() on StaticArray");
+        }
+
+        auto insertAll(const Collection<T>&, size_t) -> decltype(*this) & override {
+            throw Exceptions::UnsupportedOperation("Unsupported operation insertAll() on StaticArray");
+        }
+
+        bool remove(const T&) override { return false; }
+
+        bool removeAt(size_t) override { return false; }
+
+        auto removeAll(const Collection<T>&) -> decltype(*this) & override { return *this; }
+
+        bool contains(const T &element) const override {
+
+            for(size_t i = 0; i < sz; ++i){
+
+                if (buffer[i] == element){
+                    return true;
+                }
+
+            }
+
+            return false;
+
+        }
+
+        void clear() override { }
+
+        typename Super::Iterator begin() const override {
+            const T* b = buffer;
+            return typename Super::Iterator(const_cast<T*>(b));
+        }
+
+        typename Super::Iterator end() const override {
+            const T* e = buffer + sz;
+            return typename Super::Iterator(const_cast<T*>(e));
+        }
+
     private:
         
-        T buffer[size];
+        T buffer[sz];
         
     };
     

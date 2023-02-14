@@ -65,6 +65,14 @@ namespace Nucleus {
             explicit ParseError(char const* const message) : Exception(message) {}
 
         };
+
+        class UnsupportedOperation : public Exception {
+
+        public:
+
+            explicit UnsupportedOperation(char const* const message) : Exception(message) {}
+
+        };
         
     };
     

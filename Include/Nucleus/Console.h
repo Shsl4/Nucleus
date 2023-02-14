@@ -48,8 +48,6 @@ namespace Nucleus {
 
         }
 
-        virtual void init(bool threaded = false) = 0;
-
     private:
 
         static void write(String const& string, FILE* file = stdout) {
@@ -60,7 +58,6 @@ namespace Nucleus {
             WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), string.begin(), size, nullptr, nullptr);
 #else
             fwrite(string.begin().get(), sizeof(char), string.size(), file);
-            fflush(stdout);
 #endif
 
         }

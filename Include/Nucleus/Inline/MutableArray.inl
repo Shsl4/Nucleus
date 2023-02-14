@@ -115,7 +115,7 @@ namespace Nucleus {
 
         for(size_t i = 0; i < size(); ++i){
 
-            if (buffer[i] == element){
+            if (element == buffer[i]){
                 removeAt(i--);
                 r = true;
             }
