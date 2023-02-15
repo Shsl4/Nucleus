@@ -310,7 +310,7 @@ namespace Nucleus{
         extend(collection.size());
 
         for(char const& element : collection){
-            buffer[count++] = element;
+            buffer[count++ - 1] = element;
         }
 
         return *this;
