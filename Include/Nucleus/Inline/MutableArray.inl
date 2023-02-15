@@ -2,7 +2,6 @@
 
 #ifdef MUTABLE_INLINE
 
-#include <Nucleus/Exceptions.h>
 #include <Nucleus/String.h>
 
 namespace Nucleus {
@@ -203,7 +202,7 @@ namespace Nucleus {
 
     template<class T>
     T &MutableArray<T>::get(size_t index) const {
-        nassert(index < bufferSize);
+        assert(index < bufferSize);
         return buffer[index];
     }
 

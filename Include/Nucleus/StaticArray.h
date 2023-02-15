@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nucleus/Collection.h>
+#include <Nucleus/Exceptions.h>
 
 namespace Nucleus {
     
@@ -15,7 +16,10 @@ namespace Nucleus {
 
         StaticArray(std::initializer_list<T> const& list){
 
-            ensure(list.size() <= sz, "Initializer list size exceeds maximal array size");
+            if(list.size() > sz){
+                throw Exceptions::Exception("Initializer list size exceeds maximal array size");
+            }
+            
             Allocator<T>::copy(list.begin(), list.end(), this->buffer);
 
         }

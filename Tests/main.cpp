@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 #include <concepts>
-#include "Nucleus/MutableArray.h"
 
 using namespace Nucleus;
 
@@ -289,15 +288,9 @@ public:
         try {
             _f.invoke();
         }
-        catch(std::exception const& e) {
+        catch(Exceptions::Exception const& e) {
 
-            Console::error("Unhandled error: {}\nPrinting Stack Trace:\n", e.what());
-
-            auto trace = StackTrace::getStackTrace();
-
-            for(size_t i = 0; i < trace.size(); ++i){
-                Console::error("[{}] {}\n", i, trace[i].format());
-            }
+            Console::error("Unhandled error: {}\nPrinting Stack Trace:\n{}\n", e.what(), e.formattedTrace);
 
         }
 
@@ -375,7 +368,7 @@ int tt() {
     Console::log("{}\n", myIntArray);
     Console::log("{}\n", w);
 
-    StaticArray<int, 2> test = { 1, 2, 3, 4, 5 };
+    StaticArray<int, 50> test = { 1, 2, 3, 4, 5 };
 
     test -= 5;
 
@@ -387,7 +380,7 @@ int tt() {
     wewe = 5.6f;
 
     Console::log("{}\n", wewe.get<float>());
-
+    
 	return 0;
 
 }

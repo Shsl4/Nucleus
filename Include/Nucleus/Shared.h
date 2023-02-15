@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Nucleus/CoreMacros.h>
-#include <Nucleus/Exceptions.h>
 #include <Nucleus/Type.h>
 
 namespace Nucleus {
@@ -80,20 +79,18 @@ namespace Nucleus {
         template<typename Y>
         Shared& operator=(Shared<Y>&& other) noexcept;
         
-        FORCEINLINE T& operator*() { assertValid(); return *object; }
+        FORCEINLINE T& operator*() { assert(object); return *object; }
         
-        FORCEINLINE T* operator->() { assertValid(); return object; }
+        FORCEINLINE T* operator->() { assert(object); return object; }
         
-        FORCEINLINE T& operator*() const { assertValid(); return *object; }
+        FORCEINLINE T& operator*() const { assert(object); return *object; }
         
-        FORCEINLINE T* operator->() const { assertValid(); return object; }
+        FORCEINLINE T* operator->() const { assert(object); return object; }
         
-        FORCEINLINE T* pointer() { assertValid(); return object; }
+        FORCEINLINE T* pointer() { assert(object); return object; }
                 
-        FORCEINLINE T* pointer() const { assertValid(); return object; }
-
-        FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
-
+        FORCEINLINE T* pointer() const { assert(object); return object; }
+        
         NODISCARD FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
 
         Weak<T> makeWeak() const;
@@ -150,19 +147,17 @@ namespace Nucleus {
 
         operator bool() const;
         
-        FORCEINLINE T& operator*() { assertValid(); return *object; }
+        FORCEINLINE T& operator*() { assert(object); return *object; }
         
-        FORCEINLINE T* operator->() { assertValid(); return object; }
+        FORCEINLINE T* operator->() { assert(object); return object; }
         
-        FORCEINLINE T& operator*() const { assertValid(); return *object; }
+        FORCEINLINE T& operator*() const { assert(object); return *object; }
         
-        FORCEINLINE T* operator->() const { assertValid(); return object; }
+        FORCEINLINE T* operator->() const { assert(object); return object; }
         
-        FORCEINLINE T* pointer() { assertValid(); return object; }
+        FORCEINLINE T* pointer() { assert(object); return object; }
                 
-        FORCEINLINE T* pointer() const { assertValid(); return object; }
-
-        FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
+        FORCEINLINE T* pointer() const { assert(object); return object; }
 
         NODISCARD FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nucleus/Shared.h>
+#include <Nucleus/Exceptions.h>
 
 namespace Nucleus {
 

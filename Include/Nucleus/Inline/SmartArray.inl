@@ -4,7 +4,6 @@
 
 namespace Nucleus {
 
-
     template<class T>
     void SmartArray<T>::extend(size_t size) {
 
@@ -136,7 +135,7 @@ namespace Nucleus {
 
     template<class T>
     T *&SmartArray<T>::get(size_t index) const {
-        nassertf(index < arraySize, String::format("SmartArray: Index {} out of bounds ({})", index, arraySize));
+        assert(index < arraySize);
         return buffer[index];
     }
 

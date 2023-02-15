@@ -4,7 +4,6 @@
 
 #include <Nucleus/Unique.h>
 #include <Nucleus/Shared.h>
-#include <Nucleus/StaticArray.h>
 
 namespace Nucleus {
 
@@ -149,18 +148,18 @@ namespace Nucleus {
 
     };
 
-    template<typename T, size_t sz>
-    class Fmt<StaticArray<T, sz>> {
+    template<template<typename, size_t> typename ArrayType, typename T, size_t sz>
+    class Fmt<ArrayType<T, sz>> {
 
     public:
 
-        static String format(StaticArray<T, sz> const& array) {
+        static String format(ArrayType<T, sz> const& array) {
 
             if (array.isEmpty()) return "[]";
 
             String result = "[";
 
-            using Iterator = typename StaticArray<T, sz>::Iterator;
+            using Iterator = typename ArrayType<T, sz>::Iterator;
             using Type = typename Iterator::value_type;
 
             for(size_t i = 0; i < array.size() - 1; ++i){

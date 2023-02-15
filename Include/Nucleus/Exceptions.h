@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <Nucleus/StackTrace.h>
 
 namespace Nucleus {
 
@@ -8,11 +9,13 @@ namespace Nucleus {
 
     public:
 
-    class Exception : public std::runtime_error {
+        class Exception : public std::runtime_error {
 
         public:
 
-            explicit Exception(char const* const message) : std::runtime_error(message) {}
+            Exception(char const* format, MutableArray<StackFrame> const& trace = StackTrace::getStackTrace());
+
+            String formattedTrace;
 
         };
 
@@ -47,21 +50,21 @@ namespace Nucleus {
             explicit BadType(char const* const message) : Exception(message) {}
 
         };
-        
+
         class NullPointer : public Exception {
 
         public:
-            
+
             explicit NullPointer(char const* const message) : Exception(message) {}
 
             NullPointer() : Exception("Tried to dereference a nullptr.") {}
 
         };
-        
+
         class ParseError : public Exception {
 
         public:
-            
+
             explicit ParseError(char const* const message) : Exception(message) {}
 
         };
@@ -73,7 +76,7 @@ namespace Nucleus {
             explicit UnsupportedOperation(char const* const message) : Exception(message) {}
 
         };
-        
+
     };
-    
+
 }

@@ -9,9 +9,10 @@ project(Nucleus VERSION 0.1 LANGUAGES C CXX)
 
 add_compile_definitions(NUCLEUS_VERSION="${CMAKE_PROJECT_VERSION}")
 
-file(GLOB_RECURSE NUCELUS_HEADERS ${CMAKE_CURRENT_LIST_DIR}/Include/Nucleus/*.h*)
-file(GLOB_RECURSE NUCELUS_INLINE ${CMAKE_CURRENT_LIST_DIR}/Include/Nucleus/*.inl)
-file(GLOB_RECURSE NUCELUS_SOURCES ${CMAKE_CURRENT_LIST_DIR}/Tests/*.c*)
+file(GLOB_RECURSE NUCLEUS_HEADERS ${CMAKE_CURRENT_LIST_DIR}/Include/Nucleus/*.h*)
+file(GLOB_RECURSE NUCLEUS_INLINE ${CMAKE_CURRENT_LIST_DIR}/Include/Nucleus/*.inl)
+file(GLOB_RECURSE NUCLEUS_SOURCES ${CMAKE_CURRENT_LIST_DIR}/Source/*.c*)
+file(GLOB_RECURSE NUCLEUS_TESTS ${CMAKE_CURRENT_LIST_DIR}/Tests/*.c*)
 
 function(filterSources LIST)
     foreach(FILE ${LIST})
@@ -22,14 +23,17 @@ function(filterSources LIST)
     endforeach()
 endfunction()
 
-filterSources("${NUCELUS_SOURCES}")
-filterSources("${NUCELUS_HEADERS}")
-filterSources("${NUCELUS_INLINE}")
+filterSources("${NUCLEUS_SOURCES}")
+filterSources("${NUCLEUS_HEADERS}")
+filterSources("${NUCLEUS_TESTS}")
+filterSources("${NUCLEUS_INLINE}")
 
 set(NUCLEUS_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/Include/")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-add_executable(Nucleus ${NUCELUS_SOURCES} ${NUCELUS_HEADERS} ${NUCELUS_INLINE})
+add_library(Nucleus SHARED ${NUCLEUS_SOURCES} ${NUCLEUS_HEADERS} ${NUCLEUS_INLINE})
 target_include_directories(Nucleus PUBLIC ${NUCLEUS_INCLUDE})
-set_target_properties(Nucleus PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Build/)
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Nucleus)
+
+add_subdirectory(Tests)
+set_target_properties(Nucleus PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/Build/)

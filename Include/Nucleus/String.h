@@ -9,7 +9,7 @@
 #include <Nucleus/MutableArray.h>
 
 namespace Nucleus {
-    
+
     class String final : public Collection<char> {
 
         using Super = Collection<char>;
@@ -117,18 +117,9 @@ namespace Nucleus {
 
         friend std::ostream& operator<<(std::ostream& os, String const& string);
 
-        void extend(const size_t size) {
+        static String internalFormat(String const& fmt, MutableArray<String> const& arguments);
 
-            if(count + size > storage){
-                
-                const size_t newSize = storage + size;
-                Allocator<char>::reallocate(buffer, storage, newSize);
-                memset(buffer + count, 0, newSize - count);
-                storage = newSize;
-                
-            }
-
-        }
+        void extend(const size_t size);
         
         char* buffer = nullptr;
         size_t count = 0;
@@ -139,5 +130,5 @@ namespace Nucleus {
 }
 
 #define STRING_INLINE
-#include <Nucleus/Inline/String.inl>
+#include <Nucleus/Inline/StringFormat.inl>
 #undef STRING_INLINE
