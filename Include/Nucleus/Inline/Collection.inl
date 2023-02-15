@@ -2,8 +2,8 @@
 
 #ifdef COLLECTION_INLINE
 
-#include <Nucleus/Exceptions.h>
 #include <Nucleus/Random.h>
+#include <Nucleus/Allocator.h>
 
 namespace Nucleus {
 

@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 #include <concepts>
-#include "Nucleus/MutableArray.h"
 
 using namespace Nucleus;
 
@@ -278,7 +277,28 @@ REFLECTABLE(String)
 REFLECTABLE(Object)
 TEMPLATE_REFLECTABLE(SmartArray, int)
 
-int main(int argc, char** argv) {
+#include <Nucleus/StackTrace.h>
+
+class ExceptionHandler{
+
+public:
+
+    static void run(Function<void()> _f){
+
+        try {
+            _f.invoke();
+        }
+        catch(Exceptions::Exception const& e) {
+
+            Console::error("Unhandled error: {}\nPrinting Stack Trace:\n{}\n", e.what(), e.formattedTrace);
+
+        }
+
+    }
+
+};
+
+int tt() {
 
 	const auto ss = Shared<String>::make("Unique String!");
 	const auto si = Unique<int>::make(9);
@@ -310,15 +330,15 @@ int main(int argc, char** argv) {
     Any arr2 = ReflectionFactory::createObject("SmartArray<int>");
     Any str = ReflectionFactory::createObject("String");
     
-    *str.get<String>() = "Hello";
+    str.get<String>() = "Hello";
 
     Console::log("{}\n", str.get<String>());
     
-    auto& g = *arr2.get<SmartArray<int>>();
+    auto& g = arr2.get<SmartArray<int>>();
 
     g.add(new int(5)).add(new int(2));
 
-    Console::log("{}\n", sh.get<Circle>()->get_area());
+    Console::log("{}\n", sh.get<Circle>().get_area());
     Console::log("{} {}\n", g[0], g[1]);
 
     Function<int()> func = [](){ return 5; };
@@ -348,7 +368,29 @@ int main(int argc, char** argv) {
     Console::log("{}\n", myIntArray);
     Console::log("{}\n", w);
 
+    StaticArray<int, 50> test = { 1, 2, 3, 4, 5 };
+
+    test -= 5;
+
+    Console::log("{}\n",sizeof(StaticArray<int, 64>));
+
+    Any wewe = Any(5);
+    wewe = String("Cool");
+    const char* ok = "Hello";
+    wewe = 5.6f;
+
+    Console::log("{}\n", wewe.get<float>());
+    
 	return 0;
 
 }
 
+int main(){
+
+    ExceptionHandler::run([](){
+        tt();
+    });
+
+    return 0;
+
+}

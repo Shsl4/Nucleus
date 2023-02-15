@@ -1,7 +1,6 @@
 #pragma once
 
 #include <utility>
-#include <Nucleus/Nucleus.h>
 #include <Nucleus/Any.h>
 
 namespace Nucleus {
@@ -22,7 +21,11 @@ namespace Nucleus {
         T invoke(Args&&... args) {
 
             using FunctionType = T(*)(Args...);
-            nassertf(function.isOfType<FunctionType>(), "Bad invocation type");
+            
+            if(!function.isOfType<FunctionType>()){
+                throw Exceptions::Exception("Bad invocation type");
+            }
+            
             return (*function.get<FunctionType>())(std::forward<Args>(args)...);
 
         }

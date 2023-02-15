@@ -148,18 +148,44 @@ namespace Nucleus {
 
     };
 
-    template<typename T, template <typename Tt> typename Y> requires HasFmt<T>::value
-    class Fmt<Y<T>> {
+    template<template<typename, size_t> typename ArrayType, typename T, size_t sz>
+    class Fmt<ArrayType<T, sz>> {
 
     public:
 
-        static String format(Y<T> const& array) {
+        static String format(ArrayType<T, sz> const& array) {
+
+            if (array.isEmpty()) return "[]";
+
+            String result = "[";
+
+            using Iterator = typename ArrayType<T, sz>::Iterator;
+            using Type = typename Iterator::value_type;
+
+            for(size_t i = 0; i < array.size() - 1; ++i){
+                result += Fmt<Type>::format(array[i]) + ", ";
+            }
+
+            result += Fmt<Type>::format(array[array.size() - 1]) + "]";
+
+            return result;
+
+        }
+
+    };
+
+    template<template<typename> typename CollectionType, typename T> requires (std::is_base_of_v<Collection<T>, CollectionType<T>>)
+    class Fmt<CollectionType<T>> {
+
+    public:
+
+        static String format(CollectionType<T> const& array) {
 
             if (array.isEmpty()) return "[]";
 
             String result = "[";
             
-            using Iterator = typename Y<T>::Iterator;
+            using Iterator = typename CollectionType<T>::Iterator;
             using Type = typename Iterator::value_type;
 
             for(size_t i = 0; i < array.size() - 1; ++i){

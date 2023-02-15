@@ -2,7 +2,6 @@
 
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/Allocator.h>
-#include <Nucleus/Exceptions.h>
 #include <Nucleus/Type.h>
 
 namespace Nucleus {
@@ -45,13 +44,11 @@ namespace Nucleus {
         
         T* operator->() const;
         
-        FORCEINLINE T* pointer() { assertValid(); return object; }
+        FORCEINLINE T* pointer() { assert(object); return object; }
                 
-        FORCEINLINE T* pointer() const { assertValid(); return object; }
+        FORCEINLINE T* pointer() const { assert(object); return object; }
 
-        FORCEINLINE void assertValid() const { if(!isValid()) throw Exceptions::NullPointer(); }
-        
-        FORCEINLINE bool isValid() const { return object != nullptr; }
+        NODISCARD FORCEINLINE bool isValid() const { return object != nullptr; }
         
     private:
         

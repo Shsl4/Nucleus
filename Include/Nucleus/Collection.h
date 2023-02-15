@@ -101,7 +101,8 @@ namespace Nucleus {
 
         template<typename CollectionType> requires (std::is_base_of_v<Collection, CollectionType>)
         friend auto operator-=(CollectionType& collection, T const& element) -> CollectionType& {
-            return collection.remove(element);
+            collection.remove(element);
+            return collection;
         }
 
         template<typename CollectionType> requires (std::is_base_of_v<Collection, CollectionType>)

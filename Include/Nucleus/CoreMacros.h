@@ -37,10 +37,4 @@ namespace Nucleus {
     using UInt32 = uint32_t;
     using UInt64 = uint64_t;
 
-    void ensure(bool condition, class String const& str);
-    void ensure(bool condition);
-
 }
-
-#define nassertf(b, s) Nucleus::ensure(b, s)
-#define nassert(b) Nucleus::ensure(b)

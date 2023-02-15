@@ -6,18 +6,17 @@
 
 namespace Nucleus{
 
+    template<typename T>
+    T &Unique<T>::operator*() { assert(object); return *object; }
 
     template<typename T>
-    T &Unique<T>::operator*() { assertValid(); return *object; }
+    T const &Unique<T>::operator*() const { assert(object); return *object; }
 
     template<typename T>
-    T const &Unique<T>::operator*() const { assertValid(); return *object; }
+    T *Unique<T>::operator->() { assert(object); return object; }
 
     template<typename T>
-    T *Unique<T>::operator->() { assertValid(); return object; }
-
-    template<typename T>
-    T *Unique<T>::operator->() const { assertValid(); return object; }
+    T *Unique<T>::operator->() const { assert(object); return object; }
 
     template<typename T>
     Unique<T>& Unique<T>::operator=(Unique &&other) noexcept {
