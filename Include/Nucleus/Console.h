@@ -48,6 +48,10 @@ namespace Nucleus {
 
         }
 
+        static void log(String const& fmt){
+            write(fmt);
+        }
+
     private:
 
         static void write(String const& string, FILE* file = stdout);

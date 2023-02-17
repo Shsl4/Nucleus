@@ -40,4 +40,4 @@
 *.xcodeproj
 *.sln
 /Build
-/cmake-build-debug
+/cmake-*

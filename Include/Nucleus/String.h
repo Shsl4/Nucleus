@@ -132,7 +132,7 @@ namespace Nucleus {
         char* buffer = nullptr;
         size_t count = 0;
         size_t storage = 0;
-        
+
     };
     
 }

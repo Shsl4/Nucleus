@@ -38,3 +38,8 @@ namespace Nucleus {
     using UInt64 = uint64_t;
 
 }
+
+#define f32(x) static_cast<Nucleus::Float32>(x)
+#define f64(x) static_cast<Nucleus::Float64>(x)
+#define i32(x) static_cast<Nucleus::Int32>(x)
+#define i64(x) static_cast<Nucleus::Int64>(x)

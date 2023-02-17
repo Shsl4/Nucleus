@@ -98,18 +98,6 @@ namespace Nucleus {
 
     };
 
-    template<>
-    class Fmt<char*> {
-
-    public:
-
-        static String format(char* elem, String const& params) {
-            return elem;
-        }
-
-
-    };
-
     template<size_t n>
     class Fmt<char[n]> {
 
