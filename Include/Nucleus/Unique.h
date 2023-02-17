@@ -17,6 +17,8 @@ namespace Nucleus {
 
         Unique(nullptr_t);
 
+        Unique(T* pointer);
+
         template<typename... Args>
         static Unique make(Args&&... args);
 

@@ -147,14 +147,11 @@ namespace Nucleus {
 
     MutableArray<StackFrame> StackTrace::getStackTrace() {
 
-        constexpr Int32 maxSize = 1024;
-        auto stack = MutableArray<StackFrame>(maxSize);
+        constexpr Int32 maxSize = 128;
+        void* allocData[maxSize];
 
-        char* allocData = Allocator<char>::allocate(maxSize);
-        void* data = reinterpret_cast<void*>(allocData);
-
-        Int32 frameCount = backtrace(&data, maxSize);
-        char** symbols = backtrace_symbols(&data, frameCount);
+        Int32 frameCount = backtrace(allocData, maxSize);
+        char** symbols = backtrace_symbols(allocData, frameCount);
 
         MutableArray<String> symArray;
 
@@ -162,6 +159,8 @@ namespace Nucleus {
             symArray += symbols[i];
         }
 
+        auto stack = MutableArray<StackFrame>(maxSize);
+        
         for (const auto& sym : symArray) {
 
             MutableArray<String> parts = sym.split(' ');

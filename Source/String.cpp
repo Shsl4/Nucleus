@@ -1,5 +1,6 @@
 #include <Nucleus/String.h>
 #include <Nucleus/Exceptions.h>
+#include "Nucleus/Console.h"
 
 namespace Nucleus{
 
@@ -12,9 +13,13 @@ namespace Nucleus{
     }
 
     String::String(size_t cap) {
-
         extend(cap);
+    }
 
+    String::String(size_t cap, char data) {
+        extend(cap);
+        memset(buffer, data, cap);
+        this->count = this->capacity();
     }
 
     String::String(const char* cString) {
@@ -282,11 +287,11 @@ namespace Nucleus{
     }
 
     String::Super::Iterator String::begin() const {
-        return Iterator(buffer);
+        return Iterator(Allocator<ContinuousIterator>::construct(buffer));
     }
 
     String::Super::Iterator String::end() const {
-        return Iterator(buffer + count - 1);
+        return Iterator(Allocator<ContinuousIterator>::construct(buffer + count - 1));
     }
 
     char &String::get(size_t index) const {
@@ -439,7 +444,7 @@ namespace Nucleus{
 
         }
 
-        if(dotIndex == -1) { return static_cast<Float64>(toInteger()); }
+        if(dotIndex == -1) { Int64 o = 0; toInteger(o); return static_cast<Float64>(o); }
 
         for(Int64 i = negative; i < max; ++i){
 
@@ -467,9 +472,9 @@ namespace Nucleus{
 
     }
 
-    Int64 String::toInteger() const {
+    bool String::toInteger(Int64& out) const noexcept {
 
-        if(size() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
+        if(size() == 0) return false;
 
         const size_t max = size();
         const bool negative = buffer[0] == '-';
@@ -477,109 +482,20 @@ namespace Nucleus{
 
         for(size_t i = negative; i < max; ++i){
 
-            if(!isInteger(buffer[i])) {
-                throw Exceptions::ParseError("Failed to parse: String does not represent an integer.");
-            }
+            if(!isInteger(buffer[i])) { return false; }
 
             value += static_cast<Int64>(wcharToInteger(buffer[i]) * std::pow(10, count - i - 2));
 
         }
 
-        if (negative) {
-            value = -value;
-        }
+        if (negative) { value = -value; }
 
-        return value;
-
-    }
-
-    String String::internalFormat(const String &fmt, const MutableArray<String> &arguments) {
-
-        String formatted(fmt.size());
-
-        size_t nextArg = 0;
-        size_t last = 0;
-        bool scan = false;
-
-        for (size_t i = 0; i < fmt.size(); ++i) {
-
-            if(!scan && fmt.buffer[i] == '{') {
-
-                formatted.extend(i - last);
-                Allocator<char>::copy(fmt.buffer + last, fmt.buffer + i, formatted.buffer + formatted.count);
-                formatted.count += i - last;
-                scan = true;
-                last = i + 1;
-
-            }
-
-            if(scan && fmt.buffer[i] == '}') {
-
-                if(last == i) {
-
-                    if (nextArg >= arguments.size()){
-                        throw Exceptions::BadFormat("Uneven formatting braces / Argument count.");
-                    }
-
-                    if(String const& r = arguments[nextArg]; r.count > 1){
-
-                        formatted.extend(r.count);
-                        Allocator<char>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
-                        formatted.count += r.size();
-
-                    }
-
-                    ++nextArg;
-
-                }
-                else {
-
-                    try {
-
-                        const size_t index = fmt.substring(last, i).toInteger();
-
-                        if(index >= arguments.size()){
-                            throw Exceptions::BadFormat("Argument index out of range.");
-                        }
-
-                        String const& r = arguments[index];
-
-                        if(r.count > 1){
-
-                            formatted.extend(r.count);
-                            Allocator<char>::copy(r.buffer, r.buffer + r.count, formatted.buffer + formatted.count);
-                            formatted.count += r.size();
-
-                        }
-
-                    }
-                    catch(Exceptions::ParseError const&){
-
-                        throw Exceptions::BadFormat("Unexpected content found in format braces.");
-
-                    }
-
-                }
-
-                last = i + 1;
-                scan = false;
-
-            }
-
-        }
-
-        if (last != fmt.size()) {
-            formatted.extend(fmt.count - last);
-            Allocator<char>::copy(fmt.buffer + last, fmt.buffer + fmt.count, formatted.buffer + formatted.count);
-            formatted.count += fmt.size() - last;
-        }
-
-        // Add 1 to count the null byte.
-        formatted.count += 1;
-
-        return formatted;
+        out = value;
+        
+        return true;
 
     }
+
 
     void String::extend(const size_t size) {
 
@@ -589,8 +505,27 @@ namespace Nucleus{
             Allocator<char>::reallocate(buffer, storage, newSize);
             memset(buffer + count, 0, newSize - count);
             storage = newSize;
+            
+            if(count == 0){
+                buffer[0] = '\0';
+                ++count;
+            }
 
         }
+
+    }
+
+    String &String::addMem(const char *mem, size_t size) {
+
+        if(size == 0) return *this;
+
+        extend(size);
+
+        for(size_t i = 0; i < size; ++i){
+            buffer[count++ - 1] = mem[i];
+        }
+
+        return *this;
 
     }
 

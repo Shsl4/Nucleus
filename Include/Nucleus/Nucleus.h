@@ -17,10 +17,14 @@
 #include <Nucleus/ImmutableArray.h>
 #include <Nucleus/MutableArray.h>
 #include <Nucleus/SmartArray.h>
+#include <Nucleus/List.h>
 #include <Nucleus/Map.h>
 
 #include <Nucleus/Optional.h>
 #include <Nucleus/Random.h>
 #include <Nucleus/Any.h>
+#include <Nucleus/Bench.h>
+#include <Nucleus/ExceptionHandler.h>
+#include <Nucleus/File.h>
 
 #include <Nucleus/Console.h>

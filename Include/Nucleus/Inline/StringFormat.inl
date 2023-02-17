@@ -6,56 +6,113 @@
 #include <Nucleus/Fmt.h>
 
 namespace Nucleus {
-    
-    template<typename T, typename... Args> requires HasFmt<T>::value
-    void expand(MutableArray<String>& storage, T const& element, Args&& ... args) {
-                
-        storage += Fmt<T>::format(element);
-        
-        if (sizeof...(args) > 0) expand(storage, args...);
-        
+
+    template<typename T, typename... Args>
+    String String::formatArgument(size_t n, String const& parameters, T const& element, Args&&... args) {
+
+        if(n == 0) return Fmt<T>::format(element, parameters);
+
+        return formatArgument(n-1, parameters, args...);
+
     }
-    
-    template<typename T> requires HasFmt<T>::value
-    void expand(MutableArray<String>& storage, T const& element) {
-        
-        storage += Fmt<T>::format(element);
-        
+
+    template<typename T>
+    String String::formatArgument(size_t n, String const& parameters, T const& element)  {
+
+        if(n != 0) throw std::runtime_error("Too few arguments in pack or invalid argument index.");
+
+        return Fmt<T>::format(element, parameters);
+
     }
-    
-    inline void expand(MutableArray<String>&) { }
-    
+
     template<typename... Args>
     String String::format(String const& fmt, Args&&... args) {
 
-        MutableArray<String> arguments(sizeof...(args));
-        
-        // If no matching function is found, T must implement a formatter.
-        expand(arguments, args...);
+        String formatted(fmt.size());
 
-        if(arguments.size() == 0) return fmt;
-        
-        return internalFormat(fmt, arguments);
-        
+        const size_t max = fmt.size();
+        size_t last = 0;
+        size_t index = 0;
+        size_t arg = 0;
+
+        while(index < max){
+
+            if(fmt[index] == '{'){
+
+                formatted.addMem(fmt.begin().get() + last, index - last);
+
+                size_t rt = ++index;
+
+                while(fmt[index] != '}'){
+                    
+                    ++index;
+                    
+                    if (index >= max) {
+                        throw std::runtime_error("Uneven braces in format string.");
+                    }
+                    
+                }
+
+                String params = String(fmt.begin().get() + rt, index - rt);
+
+                auto arr = params.split(", ");
+                String& e = arr.size() > 0 ? arr[0] : params;
+                Int64 o = 0;
+                
+                if(e.toInteger(o)){
+                    formatted.addAll(formatArgument(o, arr.size() > 1 ? arr[1] : "", args...));
+                }
+                else{
+                    formatted.addAll(formatArgument(arg++, params, args...));
+                }
+                
+                last = index + 1;
+
+            }
+
+            ++index;
+
+        }
+
+        if(index != last){
+            formatted.addMem(fmt.begin().get() + last, max - last);
+        }
+
+        return formatted;
+
     }
 
     template <typename T>
-    String String::fromInteger(T const& integral) {
+    String String::fromInteger(T const& integral, size_t base) {
             
         static_assert(std::is_integral_v<T>, "T must be an integral type");
 
         if (integral == static_cast<T>(0)) return "0";
 
+        T n = integral;
+
         // Static format buffer.
         static char buf[100];
-            
-        T n = integral;
-        size_t digits = integral < 0 ? 1 : 0;
-        while (n) { n /= 10; ++digits; }
 
-        std::to_chars(buf, buf + 100, integral, 10);
+        memset(buf, 0 ,100);
+        
+        size_t offset = 0;
 
-        return { buf, digits };
+        if (integral < 0){
+            n = -n;
+            offset += 1;
+            buf[0] = '-';
+        }
+        
+        if(base == 16){
+            buf[offset] = '0';
+            buf[offset + 1] = 'x';
+            offset += 2;
+        }
+
+        std::to_chars(buf + offset, buf + 100 - offset, n, static_cast<Int32>(base));
+        
+        return { buf, strlen(buf) };
             
     }
 

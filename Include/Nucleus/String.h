@@ -28,6 +28,8 @@ namespace Nucleus {
         
         explicit String(size_t cap);
 
+        String(size_t cap, char data);
+
         String(const char* cString);
 
         String(const char* buf, size_t size);
@@ -54,6 +56,8 @@ namespace Nucleus {
 
         auto removeAll(const Collection<char> &collection) -> decltype(*this) & override;
 
+        String& addMem(const char* mem, size_t size);
+
         bool operator==(String const& other) const;
 
         bool operator==(const char* other) const;
@@ -68,7 +72,7 @@ namespace Nucleus {
         static String format(String const& fmt, Args&&... args);
         
         template<typename T>
-        static String fromInteger(T const& integral);
+        static String fromInteger(T const& integral, size_t base = 10);
 
         template<typename T>
         static String fromFloatingPoint(T const& fp);
@@ -98,7 +102,7 @@ namespace Nucleus {
 
         NODISCARD Float64 toFloat64() const;
 
-        NODISCARD Int64 toInteger() const;
+        bool toInteger(Int64& out) const noexcept;
 
         NODISCARD static bool isInteger(const char c) {
             return c >= L'0' && c <= L'9';
@@ -116,11 +120,15 @@ namespace Nucleus {
         friend std::wostream& operator<<(std::wostream& os, String const& string);
 
         friend std::ostream& operator<<(std::ostream& os, String const& string);
-
-        static String internalFormat(String const& fmt, MutableArray<String> const& arguments);
-
-        void extend(const size_t size);
         
+        template<typename T, typename... Args>
+        static String formatArgument(size_t n, String const& parameters, T const& element, Args&&... args);
+
+        template<typename T>
+        static String formatArgument(size_t n, String const& parameters, T const& element);
+        
+        void extend(const size_t size);
+                
         char* buffer = nullptr;
         size_t count = 0;
         size_t storage = 0;

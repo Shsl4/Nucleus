@@ -52,6 +52,13 @@ namespace Nucleus{
     }
 
     template<typename T>
+    Unique<T>::Unique(T* pointer) {
+        if(pointer) {
+           this->object = pointer;
+        }
+    }
+
+    template<typename T>
     void Unique<T>::drop() {
         Allocator<T>::destroy(object);
     }

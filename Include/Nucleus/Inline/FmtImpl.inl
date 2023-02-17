@@ -12,11 +12,11 @@ namespace Nucleus {
 
     public:
 
-        static String format(String const& string) {
+        static String format(String const& string, String const& params) {
             return string;
         }
 
-        static String& format(String& string) {
+        static String& format(String& string, String const& params) {
             return string;
         }
 
@@ -27,7 +27,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(nullptr_t) {
+        static String format(nullptr_t, String const& params) {
             return "nullptr";
         }
 
@@ -38,8 +38,13 @@ namespace Nucleus {
 
     public:
 
-        static String format(Integral const& elem) {
-            return String::fromInteger(elem);
+        static String format(Integral const& elem, String const& params) {
+
+            size_t base = 10;
+            if (params == "x") base = 16;
+            if (params == "b") base = 2;
+
+            return String::fromInteger(elem, base);
         }
 
 
@@ -50,7 +55,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(FloatingPoint elem) {
+        static String format(FloatingPoint elem, String const& params) {
             return String::fromFloatingPoint(elem);
         }
 
@@ -62,7 +67,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(Pointer elem) {
+        static String format(Pointer elem, String const& params) {
             return String::fromPointer(elem);
         }
 
@@ -74,7 +79,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(const bool elem) {
+        static String format(const bool elem, String const& params) {
             return elem ? "true" : "false";
         }
 
@@ -86,7 +91,19 @@ namespace Nucleus {
 
     public:
 
-        static String format(const char* elem) {
+        static String format(const char* elem, String const& params) {
+            return elem;
+        }
+
+
+    };
+
+    template<>
+    class Fmt<char*> {
+
+    public:
+
+        static String format(char* elem, String const& params) {
             return elem;
         }
 
@@ -98,7 +115,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(const char elem[n]) {
+        static String format(const char elem[n], String const& params) {
             return elem;
         }
 
@@ -109,8 +126,8 @@ namespace Nucleus {
 
     public:
 
-        static String format(Shared<T> const& elem) {
-            return elem.isValid() ? Fmt<T>::format(*elem) : "empty";
+        static String format(Shared<T> const& elem, String const& params) {
+            return elem.isValid() ? Fmt<T>::format(*elem, params) : "empty";
         }
 
     };
@@ -120,8 +137,8 @@ namespace Nucleus {
 
     public:
 
-        static String format(Weak<T> const& elem) {
-            return elem.isValid() ? Fmt<T>::format(*elem) : "empty";
+        static String format(Weak<T> const& elem, String const& params) {
+            return elem.isValid() ? Fmt<T>::format(*elem, params) : "empty";
         }
 
     };
@@ -131,8 +148,8 @@ namespace Nucleus {
 
     public:
 
-        static String format(Unique<T> const& elem) {
-            return elem.isValid() ? Fmt<T>::format(*elem) : "empty";
+        static String format(Unique<T> const& elem, String const& params) {
+            return elem.isValid() ? Fmt<T>::format(*elem, params) : "empty";
         }
 
     };
@@ -142,7 +159,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(std::type_info const& type) {
+        static String format(std::type_info const& type, String const& params) {
             return Type::name(type);
         }
 
@@ -153,7 +170,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(ArrayType<T, sz> const& array) {
+        static String format(ArrayType<T, sz> const& array, String const& params) {
 
             if (array.isEmpty()) return "[]";
 
@@ -163,10 +180,10 @@ namespace Nucleus {
             using Type = typename Iterator::value_type;
 
             for(size_t i = 0; i < array.size() - 1; ++i){
-                result += Fmt<Type>::format(array[i]) + ", ";
+                result += Fmt<Type>::format(array[i], params) + ", ";
             }
 
-            result += Fmt<Type>::format(array[array.size() - 1]) + "]";
+            result += Fmt<Type>::format(array[array.size() - 1], params) + "]";
 
             return result;
 
@@ -179,7 +196,7 @@ namespace Nucleus {
 
     public:
 
-        static String format(CollectionType<T> const& array) {
+        static String format(CollectionType<T> const& array, String const& params) {
 
             if (array.isEmpty()) return "[]";
 
@@ -189,10 +206,10 @@ namespace Nucleus {
             using Type = typename Iterator::value_type;
 
             for(size_t i = 0; i < array.size() - 1; ++i){
-                result += Fmt<Type>::format(array[i]) + ", ";
+                result += Fmt<Type>::format(array[i], params) + ", ";
             }
             
-            result += Fmt<Type>::format(array[array.size() - 1]) + "]";
+            result += Fmt<Type>::format(array[array.size() - 1], params) + "]";
             
             return result;
             

@@ -106,12 +106,12 @@ namespace Nucleus {
 
         typename Super::Iterator begin() const override {
             const T* b = buffer;
-            return typename Super::Iterator(const_cast<T*>(b));
+            return typename Super::Iterator(Allocator<typename Super::ContinuousIterator>::construct(const_cast<T*>(b)));
         }
 
         typename Super::Iterator end() const override {
             const T* e = buffer + sz;
-            return typename Super::Iterator(const_cast<T*>(e));
+            return typename Super::Iterator(Allocator<typename Super::ContinuousIterator>::construct(const_cast<T*>(e)));
         }
 
     private:

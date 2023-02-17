@@ -213,12 +213,12 @@ namespace Nucleus {
 
     template<class T>
     typename Collection<T>::Iterator MutableArray<T>::end() const {
-        return typename Super::Iterator(buffer + size());
+        return typename Super::Iterator(Allocator<typename Super::ContinuousIterator>::construct(buffer + size()));
     }
 
     template<class T>
     typename Collection<T>::Iterator MutableArray<T>::begin() const {
-        return typename Super::Iterator(buffer);
+        return typename Super::Iterator(Allocator<typename Super::ContinuousIterator>::construct(buffer));
     }
 
     template<class T>
@@ -233,8 +233,10 @@ namespace Nucleus {
         this->bufferSize = list.size();
         this->bufferCapacity = list.size();
 
+        size_t i = 0;
+
         for (T const& element : list) {
-            add(element);
+            buffer[i++] = element;
         }
 
     }

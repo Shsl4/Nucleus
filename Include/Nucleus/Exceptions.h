@@ -13,9 +13,13 @@ namespace Nucleus {
 
         public:
 
-            Exception(char const* format, MutableArray<StackFrame> const& trace = StackTrace::getStackTrace());
+            explicit Exception(char const* format, MutableArray<StackFrame> const& trace = StackTrace::getStackTrace());
 
-            String formattedTrace;
+            NODISCARD String formattedTrace() const;
+            
+        private:
+            
+            MutableArray<StackFrame> trace;
 
         };
 

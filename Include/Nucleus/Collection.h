@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nucleus/CoreMacros.h>
+#include <Nucleus/Allocator.h>
 
 namespace Nucleus {
 
@@ -8,6 +9,76 @@ namespace Nucleus {
     class Collection {
 
     public:
+        
+        class IteratorBase {
+        
+            using difference_type   = std::ptrdiff_t;
+            using value_type        = T;
+            using pointer           = T*;
+            using reference         = T&;
+            
+        public:
+            
+            virtual pointer operator->() = 0;
+            
+            virtual pointer get() const = 0;
+            
+            virtual reference operator*() = 0;
+        
+            virtual reference operator++() = 0;
+            
+            friend bool operator==(const IteratorBase& a, const IteratorBase& b) {
+                return typeid(a) == typeid(b) && a.equal(b);
+            }
+
+            virtual ~IteratorBase() = default;
+
+        protected:
+        
+            virtual bool equal(const IteratorBase& other) const { return false; }
+            
+        };
+        
+        class ContinuousIterator : public IteratorBase {
+
+            using difference_type   = std::ptrdiff_t;
+            using value_type        = T;
+            using pointer           = T*;
+            using reference         = T&;
+
+        public:
+
+            explicit ContinuousIterator(T* ptr) : ptr(ptr){
+
+            }
+
+            pointer operator->() override {
+                return ptr;
+            }
+
+            pointer get() const override {
+                return ptr;
+            }
+
+            reference operator*() override {
+                return *ptr;
+            }
+
+            reference operator++() override {
+                return *(++ptr);
+            }
+
+        protected:
+
+            bool equal(const IteratorBase &other) const override {
+                return static_cast<const ContinuousIterator&>(other).ptr == ptr;
+            }
+
+        private:
+
+            T* ptr;
+
+        };
 
         class Iterator {
 
@@ -19,22 +90,25 @@ namespace Nucleus {
             using pointer           = T*;
             using reference         = T&;
 
-            explicit Iterator(pointer ptr);
+            explicit Iterator(IteratorBase* it);
 
             reference operator*() const;
 
             pointer operator->();
 
-            reference operator++();
+            virtual reference operator++();
 
             pointer get();
 
-            friend bool operator==(const Iterator& a, const Iterator& b) { return a.ptr == b.ptr; }
-            friend bool operator!=(const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; }
+            virtual ~Iterator() {
+                Allocator<IteratorBase>::destroy(it);
+            }
 
-        private:
+            friend bool operator==(const Iterator& a, const Iterator& b) { return *a.it == *b.it; }
 
-            pointer ptr;
+        protected:
+
+            IteratorBase* it;
 
         };
 

@@ -45,6 +45,13 @@ namespace Nucleus {
             return *static_cast<T*>(pointer.pointer()->getValue());
 
         }
+        
+        template <typename T>
+        T& reinterpret() {
+
+            return *reinterpret_cast<T*>(pointer.pointer()->getValue());
+
+        }
 
         template <typename T>
         T const& get() const {

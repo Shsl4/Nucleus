@@ -30,7 +30,7 @@ namespace Nucleus {
 
     private:
 
-        inline static class String demangle(const char* name);
+        static class String demangle(const char* name);
 
 #endif
 

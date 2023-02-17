@@ -8,25 +8,25 @@
 namespace Nucleus {
 
     template <class T>
-    Collection<T>::Iterator::Iterator(pointer ptr): ptr(ptr) {}
+    Collection<T>::Iterator::Iterator(IteratorBase* it): it(it) {}
 
     template <class T>
     typename Collection<T>::Iterator::reference Collection<T>::Iterator::operator*() const {
-        return *ptr;
+        return it->operator*();
     }
 
     template <class T>
     typename Collection<T>::Iterator::pointer Collection<T>::Iterator::operator->() {
-        return ptr;
+        return it->operator->();
     }
 
     template <class T>
     typename Collection<T>::Iterator::pointer Collection<T>::Iterator::get() {
-        return ptr;
+        return it->get();
     }
 
     template <class T>
-    typename Collection<T>::Iterator::reference Collection<T>::Iterator::operator++() { ++ptr; return *ptr; }
+    typename Collection<T>::Iterator::reference Collection<T>::Iterator::operator++() { return it->operator++(); }
 
     template<class T>
     T &Collection<T>::operator[](size_t index) const {
