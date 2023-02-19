@@ -1,6 +1,5 @@
 #include <Nucleus/String.h>
 #include <Nucleus/Exceptions.h>
-#include "Nucleus/Console.h"
 
 namespace Nucleus{
 
@@ -133,7 +132,7 @@ namespace Nucleus{
 
         for (size_t i = 0; i < count - 1; ++i) {
 
-            if(buffer[i] != static_cast<wchar_t>(other[i])) return false;
+            if(buffer[i] != other[i]) return false;
 
         }
 
@@ -248,10 +247,8 @@ namespace Nucleus{
         for (size_t i = 0; i < sz; ++i) {
 
             if (separators.contains(buffer[i])){
-
-                const size_t size = i - from;
-
-                if (size != 0) {
+                
+                if (const size_t size = i - from; size != 0) {
 
                     components += String(buffer + from, size);
 
@@ -410,7 +407,7 @@ namespace Nucleus{
 
     bool String::contains(const char &element) const {
 
-        for(auto& c : *this) {
+        for(const auto& c : *this) {
             if(c == element) return true;
         }
 
@@ -454,7 +451,7 @@ namespace Nucleus{
                 throw Exceptions::ParseError("Failed to parse: String does not represent a number.");
             }
 
-            const UInt16 digit = wcharToInteger(buffer[i]);
+            const UInt16 digit = charToInteger(buffer[i]);
 
             if(i < dotIndex){
                 value += digit * std::pow(10, dotIndex - i - 1);
@@ -484,7 +481,7 @@ namespace Nucleus{
 
             if(!isInteger(buffer[i])) { return false; }
 
-            value += static_cast<Int64>(wcharToInteger(buffer[i]) * std::pow(10, count - i - 2));
+            value += static_cast<Int64>(charToInteger(buffer[i]) * std::pow(10, count - i - 2));
 
         }
 

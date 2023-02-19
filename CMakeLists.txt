@@ -31,9 +31,14 @@ filterSources("${NUCLEUS_INLINE}")
 set(NUCLEUS_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/Include/" CACHE INTERNAL "")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-add_library(Nucleus SHARED ${NUCLEUS_SOURCES} ${NUCLEUS_HEADERS} ${NUCLEUS_INLINE})
+add_library(Nucleus STATIC ${NUCLEUS_SOURCES} ${NUCLEUS_HEADERS} ${NUCLEUS_INLINE})
 target_include_directories(Nucleus PUBLIC ${NUCLEUS_INCLUDE})
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Nucleus)
 
+if(WIN32)
+target_link_libraries(Nucleus dbghelp.lib)
+endif()
+
 add_subdirectory(Tests)
+
 set_target_properties(Nucleus PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/Build/)

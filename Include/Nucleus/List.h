@@ -1,6 +1,7 @@
+#pragma once
+
 #include <Nucleus/Collection.h>
 #include <Nucleus/Unique.h>
-#include "Exceptions.h"
 
 namespace Nucleus {
 
@@ -27,6 +28,7 @@ namespace Nucleus {
 
             Node& operator=(T const& other){
                 this->value = other;
+                return *this;
             }
 
         private:
@@ -66,7 +68,7 @@ namespace Nucleus {
 
         protected:
 
-            bool equal(typename Collection<T>::IteratorBase const &other) const override {
+            NODISCARD bool equal(typename Collection<T>::IteratorBase const &other) const override {
                 return static_cast<NodeIterator const&>(other).node == node;
             }
 
@@ -76,11 +78,11 @@ namespace Nucleus {
 
         };
 
-        typename Collection<T>::Iterator begin() const override {
+        NODISCARD typename Collection<T>::Iterator begin() const override {
             return typename Collection<T>::Iterator(Allocator<NodeIterator>::construct(root));
         }
 
-        typename Collection<T>::Iterator end() const override {
+        NODISCARD typename Collection<T>::Iterator end() const override {
             return typename Collection<T>::Iterator(Allocator<NodeIterator>::construct(last()));
         }
 
@@ -102,9 +104,7 @@ namespace Nucleus {
                 ++i;
             }
 
-            if(!node){
-                throw Exceptions::Exception("List index out of range");
-            }
+            if(!node){ nthrow("List index out of range"); }
 
             return node->value;
         }
@@ -255,7 +255,7 @@ namespace Nucleus {
 
         }
 
-        bool contains(const T &element) const override {
+        NODISCARD bool contains(const T &element) const override {
 
             Node* node = root;
 
@@ -278,7 +278,7 @@ namespace Nucleus {
             return !root;
         }
 
-        Node* last() const{
+        NODISCARD Node* last() const{
 
             Node* node = root;
 

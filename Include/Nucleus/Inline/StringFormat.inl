@@ -19,7 +19,7 @@ namespace Nucleus {
     template<typename T>
     String String::formatArgument(size_t n, String const& parameters, T const& element)  {
 
-        if(n != 0) throw std::runtime_error("Too few arguments in pack or invalid argument index.");
+        if(n != 0) nthrow("Too few arguments in pack or invalid argument index.");
 
         return Fmt<T>::format(element, parameters);
 
@@ -43,23 +43,16 @@ namespace Nucleus {
 
                 size_t rt = ++index;
 
-                while(fmt[index] != '}'){
-                    
-                    ++index;
-                    
-                    if (index >= max) {
-                        throw std::runtime_error("Uneven braces in format string.");
-                    }
-                    
-                }
+                while(fmt[index] != '}' && index < max) { ++index; }
 
-                String params = String(fmt.begin().get() + rt, index - rt);
+                if (index >= max) { break; }
 
+                auto params = String(fmt.begin().get() + rt, index - rt);
                 auto arr = params.split(", ");
-                String& e = arr.size() > 0 ? arr[0] : params;
-                Int64 o = 0;
                 
-                if(e.toInteger(o)){
+                String& e = arr.size() > 0 ? arr[0] : params;
+
+                if(Int64 o = 0; e.toInteger(o)){
                     formatted.addAll(formatArgument(o, arr.size() > 1 ? arr[1] : "", args...));
                 }
                 else{
@@ -89,17 +82,17 @@ namespace Nucleus {
 
         if (integral == static_cast<T>(0)) return "0";
 
-        T n = integral;
+        Int64 n = i64(integral);
 
         // Static format buffer.
         static char buf[100];
 
-        memset(buf, 0 ,100);
+        memset(buf, 0, sizeof buf);
         
         size_t offset = 0;
 
         if (integral < 0){
-            n = -n;
+            n = std::abs(n);
             offset += 1;
             buf[0] = '-';
         }

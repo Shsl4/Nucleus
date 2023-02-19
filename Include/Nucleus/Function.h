@@ -23,7 +23,7 @@ namespace Nucleus {
             using FunctionType = T(*)(Args...);
             
             if(!function.isOfType<FunctionType>()){
-                throw Exceptions::Exception("Bad invocation type");
+                nthrow("Bad invocation type");
             }
             
             return (*function.get<FunctionType>())(std::forward<Args>(args)...);
@@ -36,7 +36,7 @@ namespace Nucleus {
 
     private:
 
-        Nucleus::Any function;
+        Any function;
 
     };
 
@@ -45,7 +45,7 @@ namespace Nucleus {
 
         using FunctionType = ReturnType(*)(Args...);
 
-        FunctionType func = nullptr;
+        FunctionType function = nullptr;
 
         friend class Fmt<Function>;
 
@@ -56,25 +56,25 @@ namespace Nucleus {
 
         Function() = default;
 
-        Function(FunctionType func) : func(func) {
+        Function(FunctionType func) : function(func) {
 
         }
 
-        template<class Lambda>
-        Function(Lambda&& lambda) : func(lambda) {
+        template<class Lambda> requires !std::is_base_of_v<Function, FunctionType>
+        Function(Lambda&& lambda) : function(lambda) {
             static_assert(std::is_invocable_r_v<ReturnType, Lambda, Args...>);
         }
 
         ReturnType operator()(Args&&... args){
-            return func(std::forward<Args>(args)...);
+            return function(std::forward<Args>(args)...);
         }
 
         ReturnType invoke(Args&&... args){
-            return func(std::forward<Args>(args)...);
+            return function(std::forward<Args>(args)...);
         }
 
         NODISCARD ErasedFunction erased() const {
-            return ErasedFunction(func);
+            return ErasedFunction(function);
         }
 
     };
@@ -96,7 +96,7 @@ namespace Nucleus {
 
         using FunctionType = ReturnType(Class::*)(Args...);
 
-        FunctionType func = nullptr;
+        FunctionType function = nullptr;
         Class* target = nullptr;
 
         friend class Fmt<Function>;
@@ -108,7 +108,7 @@ namespace Nucleus {
 
         Function() = default;
 
-        Function(FunctionType func) : func(func) {
+        Function(FunctionType func) : function(func) {
 
         }
 
@@ -118,21 +118,21 @@ namespace Nucleus {
 
         ReturnType operator()(Args&&... args){
             nassertf(target, "Trying to invoke a function without a target");
-            return (target->*func)(std::forward<Args>(args)...);
+            return (target->*function)(std::forward<Args>(args)...);
         }
 
         ReturnType invoke(Args&&... args){
             nassertf(target, "Trying to invoke a function without a target");
-            return (target->*func)(std::forward<Args>(args)...);
+            return (target->*function)(std::forward<Args>(args)...);
         }
 
         ReturnType invokeWith(Class* object, Args&&... args){
             nassertf(object, "Trying to invoke a function with an invalid object");
-            return (object->*func)(std::forward<Args>(args)...);
+            return (object->*function)(std::forward<Args>(args)...);
         }
 
         ReturnType invokeWith(Class& object, Args&&... args){
-            return (object.*func)(std::forward<Args>(args)...);
+            return (object.*function)(std::forward<Args>(args)...);
         }
 
     };

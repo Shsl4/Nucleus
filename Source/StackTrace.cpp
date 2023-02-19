@@ -70,9 +70,9 @@ namespace Nucleus {
 
 #ifdef _WIN64
 
-    Array<StackFrame> StackTrace::getStackTrace() {
+    MutableArray<StackFrame> StackTrace::getStackTrace() {
 
-    Array<StackFrame> stack;
+    MutableArray<StackFrame> stack;
     HANDLE process = GetCurrentProcess();
     HANDLE thread = GetCurrentThread();
     STACKFRAME64 frame{};
@@ -80,10 +80,10 @@ namespace Nucleus {
     DWORD64 displacement = 0;
     DWORD offset = 0;
 
-    char* name = Allocator<char>::alloc(MAX_PATH);
-    char* symData = Allocator<char>::alloc(sizeof(IMAGEHLP_SYMBOL64) + MAX_PATH);
-    char* lineData = Allocator<char>::alloc(sizeof(IMAGEHLP_LINE64));
-    char* moduleData = Allocator<char>::alloc(sizeof(IMAGEHLP_MODULE64));
+    char* name = Allocator<char>::allocate(MAX_PATH);
+    char* symData = Allocator<char>::allocate(sizeof(IMAGEHLP_SYMBOL64) + MAX_PATH);
+    char* lineData = Allocator<char>::allocate(sizeof(IMAGEHLP_LINE64));
+    char* moduleData = Allocator<char>::allocate(sizeof(IMAGEHLP_MODULE64));
 
     const auto symbol = reinterpret_cast<IMAGEHLP_SYMBOL64*>(symData);
     const auto line = reinterpret_cast<IMAGEHLP_LINE64*>(lineData);

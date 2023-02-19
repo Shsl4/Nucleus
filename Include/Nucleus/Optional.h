@@ -31,7 +31,7 @@ namespace Nucleus {
 
             if (hasValue) { return &storage.value; }
 
-            throw Nucleus::Exceptions::NullPointer("Tried to access an empty optional.");
+            throw Exceptions::NullPointer("Tried to access an empty optional.");
 
         }
 
@@ -39,7 +39,7 @@ namespace Nucleus {
 
             if (hasValue) { return &storage.value; }
 
-            throw Nucleus::Exceptions::NullPointer("Tried to access an empty optional.");
+            throw Exceptions::NullPointer("Tried to access an empty optional.");
 
         }
 

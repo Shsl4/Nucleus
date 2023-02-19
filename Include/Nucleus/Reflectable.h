@@ -15,13 +15,13 @@ public:
         try{
             return constructors[className].invoke();
         }
-        catch (Exceptions::BadKey const& key){
+        catch (Exceptions::BadKey const&){
             return Any::empty();
         }
 
     }
 
-    static void registerConstructor(Nucleus::String const& className, Function<Any()> const& constructor){
+    static void registerConstructor(String const& className, Function<Any()> const& constructor){
         constructors.add(className, constructor);
     }
 

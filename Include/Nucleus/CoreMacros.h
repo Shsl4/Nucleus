@@ -1,5 +1,7 @@
 #pragma once
 
+#define NOMINMAX
+
 #include <cstdint>
 #include <cstddef>
 #include <cassert>
@@ -10,7 +12,7 @@
 #define NORETURN [[noreturn]]
 #define DEPRECATED [[deprecated]]
 
-#ifdef _WIN32
+#ifdef _WIN64
 
 #define FORCEINLINE __forceinline
 
@@ -37,9 +39,11 @@ namespace Nucleus {
     using UInt32 = uint32_t;
     using UInt64 = uint64_t;
 
+    NORETURN void throwException(const char* message);
 }
 
 #define f32(x) static_cast<Nucleus::Float32>(x)
 #define f64(x) static_cast<Nucleus::Float64>(x)
 #define i32(x) static_cast<Nucleus::Int32>(x)
 #define i64(x) static_cast<Nucleus::Int64>(x)
+#define nthrow(m) Nucleus::throwException(m)

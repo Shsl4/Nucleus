@@ -8,17 +8,19 @@
 
 namespace Nucleus {
 
+    class String;
+    
     class Type {
 
     public:
 
         template<typename T>
-        static class String name(T const& object);
+        static String name(T const& object);
 
         template<typename T>
-        static class String name();
+        static String name();
 
-        static class String name(std::type_info const& type);
+        static String name(std::type_info const& type);
 
         template<typename T>
         static std::type_info const& of(T const& object);

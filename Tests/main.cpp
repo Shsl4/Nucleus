@@ -2,27 +2,29 @@
 
 using namespace Nucleus;
 
-List<int> myList;
+List<int> MyList;
 
 int main(int argc, const char** argv) {
 
     ExceptionHandler::run([](){
 
-        myList += { 100, 200, 5312, 141, 1510, 1010, 014112, 0x414, 5154 };
+        MyList += { 100, 200, 5312, 141, 1510, 1010, 014112, 0x414, 5154 };
         
         Bench::run([](){
 
-            Console::log("{0,x}\n{0,b}\n{0}\n", myList);
+            Console::log("{0,x}\n{b}\n{0}\n", MyList);
 
-        }, 100000);
+        }, 10000);
 
-        throw Exceptions::Exception("Exception!");
+        nthrow("Exception!");
 
     });
 
-    auto data = File::load(argv[0]);
+    const auto data = File::load(argv[0]);
 
     File::write(String(argv[0]) + ".copy", data);
+
+    Console::flush();
 
     return 0;
 

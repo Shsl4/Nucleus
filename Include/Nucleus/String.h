@@ -108,8 +108,8 @@ namespace Nucleus {
             return c >= L'0' && c <= L'9';
         }
 
-        NODISCARD static UInt16 wcharToInteger(const char c) {
-            return c - L'0';
+        NODISCARD static UInt16 charToInteger(const char c) {
+            return c - '0';
         }
 
 

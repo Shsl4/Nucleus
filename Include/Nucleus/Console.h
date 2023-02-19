@@ -3,7 +3,7 @@
 #include <Nucleus/CoreMacros.h>
 #include <Nucleus/String.h>
 
-#ifdef _WIN32
+#ifdef _WIN64
 
 #include <Windows.h>
 
@@ -51,6 +51,8 @@ namespace Nucleus {
         static void log(String const& fmt){
             write(fmt);
         }
+
+        static void flush(FILE* file = stdout);
 
     private:
 
