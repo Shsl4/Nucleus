@@ -32,6 +32,8 @@ namespace Nucleus {
 
         String(const char* cString);
 
+        String(const unsigned char* cString);
+
         String(const char* buf, size_t size);
         
         String& operator=(String const& other);

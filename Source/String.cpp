@@ -32,7 +32,22 @@ namespace Nucleus{
 
         this->count = this->storage = stringSize;
 
-        this->buffer[stringSize - 1] = L'\0';
+        this->buffer[stringSize - 1] = '\0';
+
+    }
+
+    String::String(const unsigned char* cString) {
+
+        if (!cString) { return; }
+
+        const size_t stringSize = strlen(reinterpret_cast<char const*>(cString)) + 1;
+        this->buffer = Allocator<char>::allocate(stringSize);
+
+        Allocator<unsigned char>::copy(cString, cString + stringSize, reinterpret_cast<unsigned char*>(buffer));
+
+        this->count = this->storage = stringSize;
+
+        this->buffer[stringSize - 1] = '\0';
 
     }
 

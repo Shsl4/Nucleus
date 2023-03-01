@@ -86,7 +86,12 @@ namespace Nucleus {
         }
 
         template<typename NumberType>
-        FORCEINLINE static NumberType lerp(NumberType const &from, NumberType const &to, float t) {
+        FORCEINLINE static NumberType lerp(NumberType const &from, NumberType const &to, Float32 t) {
+            return static_cast<NumberType>(from + (to - from) * t);
+        }
+
+        template<typename NumberType>
+        FORCEINLINE static NumberType lerp(NumberType const &from, NumberType const &to, Float64 t) {
             return static_cast<NumberType>(from + (to - from) * t);
         }
 
