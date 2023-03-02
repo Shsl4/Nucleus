@@ -2,54 +2,76 @@
 
 #include <utility>
 #include <Nucleus/Any.h>
+#include "Console.h"
 
 namespace Nucleus {
 
     template<typename T>
     class Function;
 
-    class ErasedFunction {
+    template<typename ReturnType, typename... Args>
+    class Function<ReturnType(Args...)> {
 
     public:
 
-        ErasedFunction() = default;
+        template<size_t n> requires (sizeof...(Args) > 0 && n < sizeof...(Args))
+        using ArgType = std::tuple_element_t<n, std::tuple<Args...>>;
 
-        template<typename T, typename... Args>
-        ErasedFunction(T(*func)(Args...)) : function(Nucleus::Any(std::move(func))) {}
+        using FunctionType = ReturnType(*)(Args...);
 
-        template<typename T, typename... Args>
-        T invoke(Args&&... args) {
+        Function() = default;
 
-            using FunctionType = T(*)(Args...);
-            
-            if(!function.isOfType<FunctionType>()){
-                nthrow("Bad invocation type");
-            }
-            
-            return (*function.get<FunctionType>())(std::forward<Args>(args)...);
+        Function(FunctionType func) : callable(Shared<Derived<FunctionType>>::make(func)) {
 
         }
 
-        NODISCARD String typeName() const {
-            return Type::name(function.type());
+        template<class LambdaType> requires std::is_invocable_r_v<ReturnType, LambdaType, Args...>
+        Function(LambdaType lambda) : callable(Shared<Derived<LambdaType>>::make(lambda)) {
+
+        }
+
+        ReturnType operator()(Args... args) const {
+            return callable.pointer()->operator()(std::forward<Args>(args)...);
         }
 
     private:
 
-        Any function;
+        struct Base {
+
+            virtual ~Base() = default;
+
+            virtual ReturnType operator()(Args&&... args) { nthrow("Illegal state"); }
+
+        };
+
+        template<typename T>
+        struct Derived : Base {
+
+            explicit Derived(T&& value) : value(std::forward<T>(value)) {}
+
+            explicit Derived(T const& value) : value(value) {}
+
+            ReturnType operator()(Args&&... args) override {
+                return value(std::forward<Args>(args)...);
+            }
+
+            T value;
+
+        };
+
+        Shared<Base> callable = nullptr;
 
     };
 
-    template<typename ReturnType, typename... Args>
-    class Function<ReturnType(Args...)> {
-
-        using FunctionType = ReturnType(*)(Args...);
-
-        FunctionType function = nullptr;
+    template<class Class, typename ReturnType, typename... Args>
+    class Function<ReturnType(Class::*)(Args...)>{
 
         friend class Fmt<Function>;
 
     public:
+
+        using FunctionType = ReturnType(Class::*)(Args...);
+        using ConstFunctionType = ReturnType(Class::*)(Args...) const;
 
         template<size_t n> requires (sizeof...(Args) > 0 && n < sizeof...(Args))
         using ArgType = std::tuple_element_t<n, std::tuple<Args...>>;
@@ -60,22 +82,26 @@ namespace Nucleus {
 
         }
 
-        template<class Lambda> requires (!std::is_base_of_v<Function, FunctionType>)
-        Function(Lambda&& lambda) : function(lambda) {
-            static_assert(std::is_invocable_r_v<ReturnType, Lambda, Args...>);
+
+        Function(ConstFunctionType func) : function((FunctionType)(func)){
+
         }
 
-        ReturnType operator()(Args&&... args){
-            return function(std::forward<Args>(args)...);
+        void bindTarget(Class* object) { this->target = object; }
+
+        ReturnType operator()(Args... args) const {
+            assert(target);
+            return (target->*function)(std::forward<Args>(args)...);
         }
 
-        ReturnType invoke(Args&&... args){
-            return function(std::forward<Args>(args)...);
+        ReturnType operator()(Class& object, Args... args) const {
+            return (object.*function)(std::forward<Args>(args)...);
         }
 
-        NODISCARD ErasedFunction erased() const {
-            return ErasedFunction(function);
-        }
+    private:
+
+        FunctionType function = nullptr;
+        Class* target = nullptr;
 
     };
 
@@ -86,56 +112,9 @@ namespace Nucleus {
 
         static String format(Function<T> const& f, String const& params) {
             return Type::name(f) + " at " +
-                Fmt<const void*>::format(*(const void**)(reinterpret_cast<const void*>(&f.func)), params);
+                   Fmt<const void*>::format(*(const void**)(reinterpret_cast<const void*>(&f.func)), params);
         }
 
     };
-
-    template<class Class, typename ReturnType, typename... Args>
-    class Function<ReturnType(Class::*)(Args...)>{
-
-        using FunctionType = ReturnType(Class::*)(Args...);
-
-        FunctionType function = nullptr;
-        Class* target = nullptr;
-
-        friend class Fmt<Function>;
-
-    public:
-
-        template<size_t n> requires (sizeof...(Args) > 0 && n < sizeof...(Args))
-        using ArgType = std::tuple_element_t<n, std::tuple<Args...>>;
-
-        Function() = default;
-
-        Function(FunctionType func) : function(func) {
-
-        }
-
-        void bindTarget(Class* object){
-            this->target = object;
-        }
-
-        ReturnType operator()(Args&&... args){
-            nassertf(target, "Trying to invoke a function without a target");
-            return (target->*function)(std::forward<Args>(args)...);
-        }
-
-        ReturnType invoke(Args&&... args){
-            nassertf(target, "Trying to invoke a function without a target");
-            return (target->*function)(std::forward<Args>(args)...);
-        }
-
-        ReturnType invokeWith(Class* object, Args&&... args){
-            nassertf(object, "Trying to invoke a function with an invalid object");
-            return (object->*function)(std::forward<Args>(args)...);
-        }
-
-        ReturnType invokeWith(Class& object, Args&&... args){
-            return (object.*function)(std::forward<Args>(args)...);
-        }
-
-    };
-
 
 }

@@ -9,10 +9,10 @@ namespace Nucleus{
 
     public:
 
-        static void run(Function<void()> _f){
+        static void run(Function<void()> f){
 
             try {
-                _f.invoke();
+                f();
             }
             catch(Exceptions::Exception const& e) {
                 Console::error("Unhandled error: {}\nPrinting Stack Trace:\n{}\n", e.what(), e.formattedTrace());

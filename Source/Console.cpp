@@ -22,4 +22,8 @@ namespace Nucleus {
 
     }
 
+    void Console::log(const String &fmt) {
+        write(fmt);
+    }
+
 }

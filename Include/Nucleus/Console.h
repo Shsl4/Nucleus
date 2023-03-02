@@ -48,9 +48,7 @@ namespace Nucleus {
 
         }
 
-        static void log(String const& fmt){
-            write(fmt);
-        }
+        static void log(String const& fmt);
 
         static void flush(FILE* file = stdout);
 

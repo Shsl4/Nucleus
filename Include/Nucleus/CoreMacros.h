@@ -47,3 +47,4 @@ namespace Nucleus {
 #define i32(x) static_cast<Nucleus::Int32>(x)
 #define i64(x) static_cast<Nucleus::Int64>(x)
 #define nthrow(m) Nucleus::throwException(m)
+#define nthrowif(b, m) if(b) Nucleus::throwException(m)

@@ -13,7 +13,7 @@ public:
     static Any createObject(String const& className) {
 
         try{
-            return constructors[className].invoke();
+            return constructors[className]();
         }
         catch (Exceptions::BadKey const&){
             return Any::empty();
