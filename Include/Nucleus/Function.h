@@ -60,7 +60,7 @@ namespace Nucleus {
 
         }
 
-        template<class Lambda> requires !std::is_base_of_v<Function, FunctionType>
+        template<class Lambda> requires (!std::is_base_of_v<Function, FunctionType>)
         Function(Lambda&& lambda) : function(lambda) {
             static_assert(std::is_invocable_r_v<ReturnType, Lambda, Args...>);
         }
