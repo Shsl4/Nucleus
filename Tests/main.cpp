@@ -2,8 +2,6 @@
 #include <any>
 using namespace Nucleus;
 
-List<int> MyList;
-
 class Object {
 
 public:
@@ -24,13 +22,13 @@ public:
 
 int main(int argc, const char** argv) {
 
-    ExceptionHandler::run([](){
+    ExceptionHandler::run([&](){
 
-        MyList += { 100, 200, 5312, 141, 1510, 1010, 014112, 0x414, 5154 };
+        List<int> myList = { 100, 200, 5312, 141, 1510, 1010, 014112, 0x414, 5154 };
         
-        Bench::run([](){
+        Bench::run([&](){
 
-            Console::log("{0,x}\n{b}\n{0}\n", MyList);
+            Console::log("{0,x}\n{b}\n{0}\n", myList);
 
         }, 10000);
 

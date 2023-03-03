@@ -21,6 +21,8 @@ namespace Nucleus {
 
         MutableArray(std::initializer_list<T> list);
 
+        MutableArray(std::vector<T> vector);
+
         ~MutableArray() override = default;
 
         typename Super::Iterator begin() const override;
@@ -51,6 +53,9 @@ namespace Nucleus {
 
         void clear() override;
 
+        auto intersect(Collection<T> const& other) -> MutableArray;
+
+
         NODISCARD bool isEmpty() const override;
 
         MutableArray& operator=(MutableArray const& other);
@@ -66,6 +71,21 @@ namespace Nucleus {
         size_t bufferCapacity = 0;
 
     };
+
+    template<class T>
+    auto MutableArray<T>::intersect(const Collection<T> &other) -> MutableArray {
+
+        MutableArray array = {};
+
+        for(auto const& e : other){
+            if (this->contains(e) && !array.contains(e)){
+                array.add(e);
+            }
+        }
+
+        return array;
+
+    }
 
 }
 

@@ -27,21 +27,9 @@ namespace Nucleus {
             if (hasValue) { storage.value.~T(); }
         }
 
-        T *get() {
+        T *get() { return hasValue ? &storage.value : nullptr; }
 
-            if (hasValue) { return &storage.value; }
-
-            throw Exceptions::NullPointer("Tried to access an empty optional.");
-
-        }
-
-        T const *get() const {
-
-            if (hasValue) { return &storage.value; }
-
-            throw Exceptions::NullPointer("Tried to access an empty optional.");
-
-        }
+        T const *get() const { return hasValue ? &storage.value : nullptr; }
 
         T &operator*() { return *get(); }
 

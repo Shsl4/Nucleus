@@ -8,14 +8,13 @@ namespace Nucleus {
 
     template<class T>
     MutableArray<T>::MutableArray(MutableArray&& other) noexcept {
-        *this = other;
+        *this = std::move(other);
     }
 
     template<class T>
     MutableArray<T>::MutableArray(const MutableArray &other) {
-        *this = std::move(other);
+        *this = other;
     }
-
 
     template<class T>
     MutableArray<T>& MutableArray<T>::operator=(MutableArray &&other) noexcept {
@@ -241,6 +240,22 @@ namespace Nucleus {
 
     }
 
+
+
+    template<class T>
+    MutableArray<T>::MutableArray(std::vector<T> vector) {
+
+        this->buffer = Allocator<T>::allocate(vector.size());
+        this->bufferSize = vector.size();
+        this->bufferCapacity = vector.size();
+
+        size_t i = 0;
+
+        for (T const& element : vector) {
+            buffer[i++] = element;
+        }
+
+    }
 
     template<class T>
     auto MutableArray<T>::removeAll(const Collection<T> &collection) -> decltype(*this) & {

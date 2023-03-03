@@ -77,6 +77,14 @@ namespace Nucleus {
             Node* node;
 
         };
+        
+        List(std::initializer_list<T> list){
+            
+            for (auto const& e : list) {
+                add(e);
+            }
+            
+        }
 
         NODISCARD typename Collection<T>::Iterator begin() const override {
             return typename Collection<T>::Iterator(Allocator<NodeIterator>::construct(root));
@@ -104,7 +112,7 @@ namespace Nucleus {
                 ++i;
             }
 
-            if(!node){ nthrow("List index out of range"); }
+            nthrowif(!node, "List index out of range");
 
             return node->value;
         }

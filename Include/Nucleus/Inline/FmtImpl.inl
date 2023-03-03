@@ -99,6 +99,18 @@ namespace Nucleus {
     };
 
     template<>
+    class Fmt<std::string> {
+
+    public:
+
+        static String format(std::string const& elem, String const& params) {
+            return elem.c_str();
+        }
+
+
+    };
+
+    template<>
     class Fmt<const unsigned char*> {
 
     public:
