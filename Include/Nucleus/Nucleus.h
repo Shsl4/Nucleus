@@ -26,6 +26,7 @@
 #include <Nucleus/Bench.h>
 #include <Nucleus/ExceptionHandler.h>
 #include <Nucleus/File.h>
+#include <Nucleus/JSON.h>
 #include <Nucleus/Math.h>
 
 #include <Nucleus/Console.h>

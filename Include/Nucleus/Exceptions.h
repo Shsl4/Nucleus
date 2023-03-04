@@ -23,12 +23,12 @@ namespace Nucleus {
 
         };
 
-        class BadKey : public Exception {
+        class LightException : public std::runtime_error {
 
         public:
 
-            explicit BadKey(char const* const message) : Exception(message) {}
-
+            explicit LightException(char const* format) : std::runtime_error(format) {}
+            
         };
 
         class OutOfRange : public Exception {
@@ -39,14 +39,7 @@ namespace Nucleus {
 
         };
 
-        class BadFormat : public Exception {
-
-        public:
-
-            explicit BadFormat(char const* const message) : Exception(message) {}
-
-        };
-
+        
         class BadType : public Exception {
 
         public:
@@ -65,19 +58,36 @@ namespace Nucleus {
 
         };
 
-        class ParseError : public Exception {
-
-        public:
-
-            explicit ParseError(char const* const message) : Exception(message) {}
-
-        };
-
+        
         class UnsupportedOperation : public Exception {
 
         public:
 
             explicit UnsupportedOperation(char const* const message) : Exception(message) {}
+
+        };
+
+        class BadKey : public LightException {
+
+        public:
+
+            explicit BadKey(char const* const message) : LightException(message) {}
+
+        };
+        
+        class BadFormat : public LightException {
+
+        public:
+
+            explicit BadFormat(char const* const message) : LightException(message) {}
+
+        };
+        
+        class ParseError : public LightException {
+
+        public:
+
+            explicit ParseError(char const* const message) : LightException(message) {}
 
         };
 

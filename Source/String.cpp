@@ -16,9 +16,15 @@ namespace Nucleus{
     }
 
     String::String(size_t cap, char data) {
-        extend(cap);
-        memset(buffer, data, cap);
+        
+        extend(cap + 1);
+
+        for(size_t i = 0; i < cap; ++i) {
+            buffer[i] = data;
+        }
+        
         this->count = this->capacity();
+        
     }
 
     String::String(const char* cString) {
@@ -91,7 +97,7 @@ namespace Nucleus{
 
     String& String::operator=(String const& other){
 
-        if(&other == this ) return *this;
+        if(&other == this) return *this;
 
         const char* start = other.buffer;
 
@@ -170,6 +176,44 @@ namespace Nucleus{
         this->count = 0;
     }
 
+    size_t String::firstIndexOf(const char c, const size_t from) const {
+
+        for (size_t i = from; i < size(); ++i) {
+            
+            if (buffer[i] == c) {
+                return i;
+            }
+            
+        }
+
+        throw Exceptions::LightException("The string does not contain the specified character");
+        
+    }
+
+    size_t String::lastIndexOf(const char c) const {
+
+        for (size_t i = count; i > 0; --i) {
+            
+            if (buffer[i - 1] == c) {
+                return i - 1;
+            }
+            
+        }
+
+        throw Exceptions::LightException("The string does not contain the specified character");
+        
+    }
+
+    size_t String::numberOccurrences(const char c) const {
+
+        size_t ct = 0;
+
+        for (size_t i = 0; i < count; ++i) { if(buffer[i] == c) ++ct; }
+
+        return ct;
+        
+    }
+
     MutableArray<String> String::split(const char separator) const {
 
         MutableArray<String> components;
@@ -217,7 +261,7 @@ namespace Nucleus{
 
     String& String::removeOccurrences(String const& other) {
 
-        const size_t size = this->size();
+        size_t size = this->size();
         const size_t otherSize = other.size();
 
         size_t i = 0, j = 0;
@@ -227,12 +271,14 @@ namespace Nucleus{
             if(buffer[i] == other.buffer[j]) {
 
                 if(++j == otherSize) {
-
-                    Allocator<char>::move(buffer + i + 1, buffer + size, buffer + i + 1 - otherSize);
-                    memset(buffer + size - otherSize, 0, otherSize);
-                    this->count -= otherSize;
-                    i = j = 0;
-                    continue;
+                    
+                    const auto from = buffer + i + 1;
+                    const auto to = buffer + count;
+                    Allocator<char>::move(from, to, from - j);
+                    memset(to - j, '\0', j);
+                    this->count -= j;
+                    i -= j;
+                    j = 0;
 
                 }
 
@@ -320,11 +366,11 @@ namespace Nucleus{
 
     }
 
-    auto String::addAll(const Collection<char> &collection) -> decltype(*this)& {
+    auto String::addAll(const Collection &collection) -> decltype(*this)& {
 
         if (collection.isEmpty()) return *this;
 
-        extend(collection.size());
+        extend(collection.size() + 1);
 
         for(char const& element : collection){
             buffer[count++ - 1] = element;
@@ -411,7 +457,7 @@ namespace Nucleus{
     }
 
 
-    auto String::removeAll(const Collection<char> &collection) -> decltype(*this)& {
+    auto String::removeAll(const Collection &collection) -> decltype(*this)& {
 
         for(auto const& e : collection){
             remove(e);
@@ -430,7 +476,7 @@ namespace Nucleus{
 
     }
 
-    bool String::isEmpty() const { return count == 0; }
+    bool String::isEmpty() const { return count == 0 || buffer[0] == '\0'; }
 
     size_t String::capacity() const { return storage; }
 
