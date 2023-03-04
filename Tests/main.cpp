@@ -1,5 +1,6 @@
 #include <Nucleus/Nucleus.h>
 #include <any>
+
 using namespace Nucleus;
 
 class Object {
@@ -21,7 +22,7 @@ public:
 };
 
 int main(int argc, const char** argv) {
-
+    
     ExceptionHandler::run([&](){
 
         List<int> myList = { 100, 200, 5312, 141, 1510, 1010, 014112, 0x414, 5154 };
@@ -70,7 +71,7 @@ int main(int argc, const char** argv) {
 
     Object object;
     MutableArray<int> arr;
-    MutableArray<Object*> objArr = { &object };
+    MutableArray objArr = { &object };
 
     auto x = StaticArray<int, 4>({ 5, 6, 7, 8 });
     polymorphicFunc(arr, x);
@@ -78,9 +79,7 @@ int main(int argc, const char** argv) {
     constRef(objArr[0]);
 
     Console::log("{}\n", arr);
-
-    Console::flush();
-
+    
     return 0;
 
 }

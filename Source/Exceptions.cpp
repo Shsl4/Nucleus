@@ -11,8 +11,8 @@ namespace Nucleus {
         
         String fmt;
         
-        for(size_t i = 2; i < trace.size(); ++i){
-            fmt += String::format("[{}] {}\n", i - 2, trace[i].format());
+        for(size_t i = 0; i < trace.size(); ++i){
+            fmt += String::format("[{}] {}\n", i, trace[i].format());
         }
         
         return fmt;

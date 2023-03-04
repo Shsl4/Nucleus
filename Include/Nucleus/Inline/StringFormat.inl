@@ -38,16 +38,21 @@ namespace Nucleus {
         while(index < max){
 
             if(fmt[index] == '{'){
+                
+                const size_t braceIndex = index;
 
-                formatted.addMem(fmt.begin().get() + last, index - last);
+                while(++index < max) {
+                    
+                    if(fmt[index] == '}') {
+                        formatted.addMem(fmt.begin().get() + last, braceIndex - last);
+                        break;
+                    }
+                    
+                }
 
-                size_t rt = ++index;
-
-                while(fmt[index] != '}' && index < max) { ++index; }
-
-                if (index >= max) { break; }
-
-                auto params = String(fmt.begin().get() + rt, index - rt);
+                if(index >= max) break;
+                
+                auto params = String(fmt.begin().get() + braceIndex + 1, index - braceIndex - 1);
                 auto arr = params.split(", ");
                 
                 String& e = arr.size() > 0 ? arr[0] : params;

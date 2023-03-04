@@ -65,10 +65,10 @@ namespace Nucleus {
         bool operator==(const char* other) const;
 
         String& insertAll(const char* string, size_t index);
+        
+        String& removeOccurrences(String const& other);
 
         void clear() override;
-
-        String& removeOccurrences(String const& other);
         
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
@@ -99,6 +99,12 @@ namespace Nucleus {
         NODISCARD MutableArray<String> split(char separator) const;
 
         NODISCARD String substring(size_t from, size_t to) const;
+
+        NODISCARD size_t firstIndexOf(char c, size_t from = 0) const;
+
+        NODISCARD size_t lastIndexOf(char c) const;
+
+        NODISCARD size_t numberOccurrences(char c) const;
 
         NODISCARD size_t capacity() const override;
 
