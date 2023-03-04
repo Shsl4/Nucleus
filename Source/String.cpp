@@ -275,7 +275,7 @@ namespace Nucleus{
                     const auto from = buffer + i + 1;
                     const auto to = buffer + count;
                     Allocator<char>::move(from, to, from - j);
-                    memset(to - 1, '\0', j);
+                    memset(to - j, '\0', j);
                     this->count -= j;
                     i -= j;
                     j = 0;
