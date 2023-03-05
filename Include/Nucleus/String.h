@@ -43,14 +43,18 @@ namespace Nucleus {
         String operator+(String const& other) const;
 
         String& operator+=(String const& other);
+        
+        bool operator==(String const& other) const;
+
+        bool operator==(const char* other) const;
 
         auto add(const char &element) -> decltype(*this) & override;
 
-        auto addAll(const Collection<char> &collection) -> decltype(*this) & override;
+        auto addAll(const Collection &collection) -> decltype(*this) & override;
 
         auto insert(const char &element, size_t index) -> decltype(*this) & override;
 
-        auto insertAll(const Collection<char> &collection, size_t index) -> decltype(*this) & override;
+        auto insertAll(const Collection &collection, size_t index) -> decltype(*this) & override;
 
         bool removeAt(size_t index) override;
 
@@ -59,10 +63,6 @@ namespace Nucleus {
         auto removeAll(const Collection<char> &collection) -> decltype(*this) & override;
 
         String& addMem(const char* mem, size_t size);
-
-        bool operator==(String const& other) const;
-
-        bool operator==(const char* other) const;
 
         String& insertAll(const char* string, size_t index);
         
@@ -82,9 +82,9 @@ namespace Nucleus {
         template<typename T>
         static String fromPointer(const T* pointer);
 
-        NODISCARD Super::Iterator begin() const override;
+        NODISCARD Iterator begin() const override;
 
-        NODISCARD Super::Iterator end() const override;
+        NODISCARD Iterator end() const override;
 
         NODISCARD char& get(size_t index) const override;
 
@@ -110,6 +110,10 @@ namespace Nucleus {
 
         NODISCARD Float64 toFloat64() const;
 
+        NODISCARD bool toBool() const;
+
+        NODISCARD String toLower() const;
+        
         bool toInteger(Int64& out) const noexcept;
 
         NODISCARD static bool isInteger(const char c) {
@@ -135,7 +139,7 @@ namespace Nucleus {
         template<typename T>
         static String formatArgument(size_t n, String const& parameters, T const& element);
         
-        void extend(const size_t size);
+        void extend(size_t size);
                 
         char* buffer = nullptr;
         size_t count = 0;

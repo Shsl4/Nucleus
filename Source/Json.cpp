@@ -1,15 +1,15 @@
 ﻿#include <Nucleus/Json.h>
 #include <Nucleus/File.h>
 #include <Nucleus/Exceptions.h>
-
-#include "Nucleus/Console.h"
-#include "Nucleus/Function.h"
-#include "Nucleus/Map.h"
+#include <Nucleus/Console.h>
+#include <Nucleus/Function.h>
+#include <Nucleus/Map.h>
 
 namespace Nucleus {
+    class Container;
 
     Json::Field::Field(String name, String data, DataType type): name(std::move(name)),
-                                                                   data(std::move(data)), type(type) {}
+                                                                 data(std::move(data)), type(type) {}
 
     bool Json::Field::operator==(const Field& other) const {
 
@@ -40,29 +40,69 @@ namespace Nucleus {
                 
     }
 
-    void Json::Object::write(String& str, const size_t indent) const {
+    bool Json::Object::getBool(String const& name) const {
 
-        auto ind = String(4 * indent, ' ');
+        for (auto const& field : fields) {
+                    
+            if(field.name == name) {
+                        
+                if (field.type == DataType::Boolean) {
+
+                    return field.data.toBool();
+                            
+                }
+
+                throw Exceptions::BadType("The variable is not a boolean.");
+                        
+            }
+                    
+        }
+
+        throw Exceptions::BadType("The variable does not exist.");
+                
+    }
+
+    String Json::Object::getString(String const& name) const {
+
+        for (auto const& field : fields) {
+                    
+            if(field.name == name) {
+                        
+                if (field.type == DataType::String) {
+
+                    return field.data;
+                            
+                }
+
+                throw Exceptions::BadType("The variable is not a string.");
+                        
+            }
+                    
+        }
+
+        throw Exceptions::BadType("The variable does not exist.");
+        
+    }
+
+    void Json::Object::write(String& str, const size_t indent, const bool useIndent) const {
+
+        auto ind = String(4 * indent * useIndent, ' ');
         
         if(name.isEmpty()) {
-
-            str += String::format("{}{\n", ind);
-            
+            str += String::format("{}{ \n", ind);
         }
         else {
-            str += String::format("{}\"{}\": {\n", ind, name);
+            str += String::format("{}\"{}\": { \n", ind, name);
         }
         
         if(objects.size() > 0) {
-
-            if(fields.size() > 0) { str += ",\n"; }
             
             for (size_t i = 0; i < objects.size() - 1; ++i) {
-                objects[i].write(str, indent + 1);
+                objects[i].write(str, indent + useIndent);
                 str += ",\n";
             }
 
-            objects[objects.size() - 1].write(str, indent + 1);
+            objects[objects.size() - 1].write(str, indent + useIndent);
             
         }
 
@@ -71,15 +111,15 @@ namespace Nucleus {
             if(objects.size() > 0) { str += ",\n"; }
             
             for (size_t i = 0; i < fields.size() - 1; ++i) {
-                fields[i].write(str, indent + 1);
+                fields[i].write(str, indent + useIndent);
                 str += ",\n";
             }
 
-            fields[fields.size() - 1].write(str, indent + 1);
+            fields[fields.size() - 1].write(str, indent + useIndent);
             
         }
         
-        str += String::format("\n{}}", ind);
+        str += String::format(" \n{}}", ind);
         
     }
 
@@ -166,12 +206,12 @@ namespace Nucleus {
         
     }
 
-    void Json::nextString(String const& data, const size_t from, size_t& begin, size_t& end) {
+    void Json::nextString(String const& data, const size_t start, size_t& begin, size_t& end) {
 
         bool found = false;
         size_t bIdx = 0;
         
-        for (size_t i = from; i < data.size(); ++i) {
+        for (size_t i = start; i < data.size(); ++i) {
 
             if(data[i] == '"') {
 
@@ -258,7 +298,7 @@ namespace Nucleus {
         
     }
     
-    void Json::parseNextObject(String const& data, Object& storage) {
+    void Json::parseObject(String const& data, Object& storage) {
 
         static Map<DataType, Function<void(String const&, size_t, size_t&, size_t&)>> funcMap = {
                 
@@ -279,7 +319,7 @@ namespace Nucleus {
             
             size_t from = 0;
             size_t to = 0;
-            nextString(proc, current + 1, from, to);
+            nextString(proc, current, from, to);
 
             if(from == 0 && to == 0) return;
 
@@ -288,12 +328,12 @@ namespace Nucleus {
 
             funcMap[type](proc, to + 1, from, to);
 
-            current = to;
+            current = to + 1;
             
             if(type == DataType::Object) {
                 
                 storage.objects += Object(tag);
-                parseNextObject(proc.substring(from,  to), storage.objects[storage.objects.size() - 1]);
+                parseObject(proc.substring(from,  to), storage.objects[storage.objects.size() - 1]);
                 continue;
                 
             }
@@ -330,7 +370,7 @@ namespace Nucleus {
 
         Json json = {};
 
-        parseNextObject(data, json.rootObject);
+        parseObject(data, json.rootObject);
         
         return json;
         

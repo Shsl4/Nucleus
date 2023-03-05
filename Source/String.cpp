@@ -530,6 +530,32 @@ namespace Nucleus{
 
     }
 
+    bool String::toBool() const {
+
+        if(*this == "0") return false;
+        if(*this == "1") return true;
+        
+        const String copy = toLower();
+        
+        if (copy == "true") return true;
+        if (copy == "false") return true;
+
+        throw Exceptions::Exception("This string does not represent a bool.");
+        
+    }
+
+    String String::toLower() const {
+
+        String copy = *this;
+
+        for (auto& e : copy) {
+            e = tolower(e);
+        }
+
+        return copy;
+        
+    }
+
     bool String::toInteger(Int64& out) const noexcept {
 
         if(size() == 0) return false;
