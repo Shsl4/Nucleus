@@ -73,10 +73,10 @@ namespace Nucleus {
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
         
-        template<typename T>
+        template<typename T> requires std::is_integral_v<T>
         static String fromInteger(T const& integral, size_t base = 10);
 
-        template<typename T>
+        template<typename T> requires std::is_floating_point_v<T>
         static String fromFloatingPoint(T const& fp);
 
         template<typename T>
@@ -114,7 +114,9 @@ namespace Nucleus {
 
         NODISCARD String toLower() const;
         
-        bool toInteger(Int64& out) const noexcept;
+        bool noThrowToInteger(Int64& out) const noexcept;
+        
+        bool toInteger(Int64& out) const;
 
         NODISCARD static bool isInteger(const char c) {
             return c >= L'0' && c <= L'9';

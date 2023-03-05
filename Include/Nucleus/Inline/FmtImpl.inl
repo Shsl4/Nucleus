@@ -186,7 +186,7 @@ namespace Nucleus {
 
             if (array.isEmpty()) return "[]";
 
-            String result = "[";
+            String result = "[ ";
 
             using Iterator = typename ArrayType<T, sz>::Iterator;
             using Type = typename Iterator::value_type;
@@ -195,7 +195,7 @@ namespace Nucleus {
                 result += Fmt<Type>::format(array[i], params) + ", ";
             }
 
-            result += Fmt<Type>::format(array[array.size() - 1], params) + "]";
+            result += Fmt<Type>::format(array[array.size() - 1], params) + " ]";
 
             return result;
 
@@ -212,7 +212,7 @@ namespace Nucleus {
 
             if (array.isEmpty()) return "[]";
 
-            String result = "[";
+            String result = "[ ";
             
             using Iterator = typename CollectionType<T>::Iterator;
             using Type = typename Iterator::value_type;
@@ -221,7 +221,7 @@ namespace Nucleus {
                 result += Fmt<Type>::format(array[i], params) + ", ";
             }
             
-            result += Fmt<Type>::format(array[array.size() - 1], params) + "]";
+            result += Fmt<Type>::format(array[array.size() - 1], params) + " ]";
             
             return result;
             

@@ -538,9 +538,9 @@ namespace Nucleus{
         const String copy = toLower();
         
         if (copy == "true") return true;
-        if (copy == "false") return true;
+        if (copy == "false") return false;
 
-        throw Exceptions::Exception("This string does not represent a bool.");
+        throw Exceptions::ParseError("This string does not represent a bool.");
         
     }
 
@@ -556,7 +556,7 @@ namespace Nucleus{
         
     }
 
-    bool String::toInteger(Int64& out) const noexcept {
+    bool String::noThrowToInteger(Int64& out) const noexcept {
 
         if(size() == 0) return false;
 
@@ -578,6 +578,32 @@ namespace Nucleus{
         
         return true;
 
+    }
+
+    bool String::toInteger(Int64& out) const {
+
+        if(size() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
+
+        const size_t max = size();
+        const bool negative = buffer[0] == '-';
+        Int64 value = 0;
+
+        for(size_t i = negative; i < max; ++i){
+
+            if(!isInteger(buffer[i])) {
+                throw Exceptions::ParseError("Failed to parse: String does not represent a number.");
+            }
+
+            value += static_cast<Int64>(charToInteger(buffer[i]) * std::pow(10, count - i - 2));
+
+        }
+
+        if (negative) { value = -value; }
+
+        out = value;
+        
+        return true;
+        
     }
 
 

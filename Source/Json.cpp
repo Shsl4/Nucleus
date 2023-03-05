@@ -6,123 +6,7 @@
 #include <Nucleus/Map.h>
 
 namespace Nucleus {
-    class Container;
-
-    Json::Field::Field(String name, String data, DataType type): name(std::move(name)),
-                                                                 data(std::move(data)), type(type) {}
-
-    bool Json::Field::operator==(const Field& other) const {
-
-        return name == other.name && data == other.data; 
-                
-    }
-
-    void Json::Field::write(String& str, const size_t indent) const {
-
-        auto ind = String(4 * indent, ' ');
-
-        if(type == DataType::String) {
-            str += String::format(R"({}"{}": "{}")", ind, name, data);
-        }
-        else {
-            str += String::format(R"({}"{}": {})", ind, name, data);
-        }
-        
-    }
-
-    Json::Object::Object(String name): name(std::move(name)) {
-                
-    }
-
-    bool Json::Object::operator==(const Object& other) const {
-
-        return name == other.name && fields == other.fields && objects == other.objects; 
-                
-    }
-
-    bool Json::Object::getBool(String const& name) const {
-
-        for (auto const& field : fields) {
-                    
-            if(field.name == name) {
-                        
-                if (field.type == DataType::Boolean) {
-
-                    return field.data.toBool();
-                            
-                }
-
-                throw Exceptions::BadType("The variable is not a boolean.");
-                        
-            }
-                    
-        }
-
-        throw Exceptions::BadType("The variable does not exist.");
-                
-    }
-
-    String Json::Object::getString(String const& name) const {
-
-        for (auto const& field : fields) {
-                    
-            if(field.name == name) {
-                        
-                if (field.type == DataType::String) {
-
-                    return field.data;
-                            
-                }
-
-                throw Exceptions::BadType("The variable is not a string.");
-                        
-            }
-                    
-        }
-
-        throw Exceptions::BadType("The variable does not exist.");
-        
-    }
-
-    void Json::Object::write(String& str, const size_t indent, const bool useIndent) const {
-
-        auto ind = String(4 * indent * useIndent, ' ');
-        
-        if(name.isEmpty()) {
-            str += String::format("{}{ \n", ind);
-        }
-        else {
-            str += String::format("{}\"{}\": { \n", ind, name);
-        }
-        
-        if(objects.size() > 0) {
-            
-            for (size_t i = 0; i < objects.size() - 1; ++i) {
-                objects[i].write(str, indent + useIndent);
-                str += ",\n";
-            }
-
-            objects[objects.size() - 1].write(str, indent + useIndent);
-            
-        }
-
-        if(fields.size() > 0) {
-
-            if(objects.size() > 0) { str += ",\n"; }
-            
-            for (size_t i = 0; i < fields.size() - 1; ++i) {
-                fields[i].write(str, indent + useIndent);
-                str += ",\n";
-            }
-
-            fields[fields.size() - 1].write(str, indent + useIndent);
-            
-        }
-        
-        str += String::format(" \n{}}", ind);
-        
-    }
-
+    
     bool startsWith(String const& str, String const& test, const size_t from = 0) {
 
         if(test.size() > str.size()) return false;
@@ -297,8 +181,101 @@ namespace Nucleus {
         throw Exceptions::Exception("Invalid format");
         
     }
+
+    void removeExtraSpaces(String& str) {
+
+        size_t begin = 0;
+        size_t end = str.size();
+
+        for(auto const& c : str) {
+            if(c == ' ') ++begin;
+            else { break; }
+        }
+        
+        for(size_t i = end; i > 0; --i) {
+            char c = str[i - 1];
+            if(c == ' ') --end;
+            else { break; }
+        }
+
+        str = str.substring(begin, end);
+        
+    }
+
+    bool Json::asFloatArray(Container* container, String const& tag, MutableArray<String> const& data) {
+        
+        try {
+
+            auto floats = MutableArray<Float64>(data.size());
+
+            for (auto const& str : data) {
+
+                floats += str.toFloat64();
+                
+            }
+
+            container->add(tag, floats);
+            
+            return true;
+            
+        }
+        catch (std::exception const&) {
+            return false;
+        }
+        
+    }
+
+    bool Json::asBoolArray(Container* container, String const& tag, MutableArray<String> const& data) {
+        
+        try {
+
+            auto booleans = MutableArray<bool>(data.size());
+
+            for (auto const& str : data) {
+
+                booleans += str.toBool();
+                
+            }
+
+            container->add(tag, booleans);
+            
+            return true;
+            
+        }
+        catch (std::exception const&) {
+            return false;
+        }
+        
+    }
+
+    bool Json::asObjectArray(Container* container, String const& tag, MutableArray<String> const& data) {
+        
+        try {
+            
+            for (auto const& str : data) {
+
+                if(str[0] != '{' || str[str.size() - 1] != '}') { return false; }
+                
+            }
+
+            DataArray* array = container->createArray(tag);
+            
+            for (auto const& str : data) {
+                
+                parseObject(str, array->createContainer());
+                
+            }
+            
+            return true;
+            
+        }
+        catch (std::exception const&) {
+            return false;
+        }
+        
+    }
     
-    void Json::parseObject(String const& data, Object& storage) {
+    void Json::parseObject(String const& data, Container* storage) {
 
         static Map<DataType, Function<void(String const&, size_t, size_t&, size_t&)>> funcMap = {
                 
@@ -329,25 +306,146 @@ namespace Nucleus {
             funcMap[type](proc, to + 1, from, to);
 
             current = to + 1;
-            
-            if(type == DataType::Object) {
+
+            switch (type) {
+                case DataType::Object:
+                    
+                    parseObject(proc.substring(from,  to), storage->createContainer(tag));
+                    break;
                 
-                storage.objects += Object(tag);
-                parseObject(proc.substring(from,  to), storage.objects[storage.objects.size() - 1]);
-                continue;
+                case DataType::String:
+                    
+                    storage->add(tag, proc.substring(from,  to));
+                    break;
+                
+                case DataType::Boolean:
+                    
+                    storage->add(tag, proc.substring(from,  to).toBool());
+                    break;
+                
+                case DataType::Number:
+                    
+                    storage->add(tag, proc.substring(from,  to).toFloat64());
+                    break;
+                
+                case DataType::Null:
+                    
+                    storage->add(tag, nullptr);
+                    break;
+                
+                case DataType::List:
+                    
+                    const auto e = proc.substring(from,  to);
+                    auto array = e.substring(1, e.size() - 1).removeOccurrences("\n").split(",");
+
+                    for(auto& element : array) {
+                        removeExtraSpaces(element);
+                    }
+
+                    if(asBoolArray(storage, tag, array)) break;
+                
+                    if(asFloatArray(storage, tag, array)) break;
+                
+                    if(asObjectArray(storage, tag, array)) break;
+                
+                    storage->add(tag, array);
+                
+                    break;
                 
             }
-            
-            storage.fields += Field(tag, proc.substring(from,  to), type);
 
         }
+        
+    }
+    
+    void Json::writeElement(Element* element, String& str, const size_t indent) {
+
+        auto ind = String(4 * indent, ' ');
+
+        if(dynamic_cast<Field<String>*>(element)) {
+            str += String::format(R"({}"{}": "{}")", ind, element->name(), element->stringValue());
+        }
+        else {
+            str += String::format(R"({}"{}": {})", ind, element->name(), element->stringValue());
+        }
+        
+    }
+
+    template<typename T>
+    void forEachBeforeLast(SmartArray<T> const& e, Function<void(T*)> const& f, Function<void()> const& all) {
+
+        for (size_t i = 0; i < e.size(); ++i) {
+            f(e[i]);
+            if(i != e.size() - 1) { all(); }
+        }
+        
+    }
+    
+    void Json::writeArray(const DataArray* array, String& str, const size_t indent) {
+
+        auto ind = String(4 * indent, ' ');
+
+        str += String::format("{}\"{}\": [ \n", ind, array->name());
+
+        const Function<void(Element*)> func = [&](Element* p) {
+
+            if(const auto* ct = dynamic_cast<Container*>(p)) {
+                writeContainer(ct, str, indent + 1, true);
+            }
+            else if(const auto* arr = dynamic_cast<DataArray*>(p)) {
+                writeArray(arr, str, indent + 1);
+            }
+            else {
+                writeElement(p, str, indent + 1);
+            }
+            
+        };
+        
+        forEachBeforeLast(array->elements(), func, [&] {
+            str += ",\n";            
+        });
+
+        str += String::format(" \n{}]", ind);
+        
+    }
+    
+    void Json::writeContainer(const Container* container, String& str, const size_t indent, const bool useIndent) {
+
+        auto ind = String(4 * indent * useIndent, ' ');
+        
+        if(container->name().isEmpty()) {
+            str += String::format("{}{ \n", ind);
+        }
+        else {
+            str += String::format("{}\"{}\": { \n", ind, container->name());
+        }
+
+        const Function<void(Element*)> func = [&](Element* p) {
+
+            if(const auto* ct = dynamic_cast<Container*>(p)) {
+                writeContainer(ct, str, indent + 1, true);
+            }
+            else if(const auto* arr = dynamic_cast<DataArray*>(p)) {
+                writeArray(arr, str, indent + 1);
+            }
+            else {
+                writeElement(p, str, indent + 1);
+            }
+            
+        };
+        
+        forEachBeforeLast(container->elements(), func, [&] {
+            str += ",\n";            
+        });
+        
+        str += String::format(" \n{}}", ind);
         
     }
 
     void Json::write(String const& fileName) const {
 
         String str;
-        rootObject.write(str, 0);
+        writeContainer(storage.rootContainer(), str, 0, true);
         File::write(fileName, str);
         
     }
@@ -370,7 +468,7 @@ namespace Nucleus {
 
         Json json = {};
 
-        parseObject(data, json.rootObject);
+        parseObject(data, json.archive().rootContainer());
         
         return json;
         

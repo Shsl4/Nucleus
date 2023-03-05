@@ -57,7 +57,7 @@ namespace Nucleus {
                 
                 String& e = arr.size() > 0 ? arr[0] : params;
 
-                if(Int64 o = 0; e.toInteger(o)){
+                if(Int64 o = 0; e.noThrowToInteger(o)){
                     formatted.addAll(formatArgument(o, arr.size() > 1 ? arr[1] : "", args...));
                 }
                 else{
@@ -80,11 +80,9 @@ namespace Nucleus {
 
     }
 
-    template <typename T>
+    template <typename T> requires std::is_integral_v<T>
     String String::fromInteger(T const& integral, size_t base) {
-            
-        static_assert(std::is_integral_v<T>, "T must be an integral type");
-
+        
         if (integral == static_cast<T>(0)) return "0";
 
         Int64 n = i64(integral);
@@ -114,12 +112,12 @@ namespace Nucleus {
             
     }
 
-    template <typename T>
+    template <typename T> requires std::is_floating_point_v<T>
     String String::fromFloatingPoint(T const& fp) {
 
-        static_assert(std::is_floating_point_v<T>, "T must be an integral type");
-
-        return std::to_string(fp).c_str();
+        std::stringstream stringstream;
+        stringstream << fp;
+        return stringstream.str().c_str();
             
     }
 

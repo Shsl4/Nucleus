@@ -21,148 +21,164 @@ public:
 
 };
 
-class MyClass3 {
+namespace Nucleus {
 
-public:
+    class MyClass3 {
+
+    public:
     
-    bool operator==(const MyClass3&) const {
-        return true;
-    }
+        bool operator==(const MyClass3& other) const {
+            return field == other.field;
+        }
 
-    int field = 0;
+        int field = 0;
     
-};
+    };
 
 
-class MyClass2 {
+    class MyClass2 {
 
-private:
+    public:
 
-    friend Serializer<MyClass2>;
+        bool operator==(const MyClass2& other) const {
+
+            return myInts == other.myInts
+                && objects == other.objects;
+            
+        }
     
-    MutableArray<int> myInts = { 1, 2, 5, 6, 8 };
-    MutableArray<MyClass3> objects = { {}, {}, {}, {} };
+        MutableArray<int> myInts = { 1, 2, 5, 6, 8 };
+        MutableArray<MyClass3> objects = { {}, {}, {}, {} };
     
-};
+    };
 
-class MyClass {
+    class MyClass {
 
-private:
+    public:
 
-    friend Serializer<MyClass>;
+        bool operator==(const MyClass& other) const {
+
+            return myBool == other.myBool
+                && myName == other.myName
+                && Math::deq(myValue, other.myValue)
+                && obj == other.obj;
+            
+        }
     
-    bool myBool = false;
-    String myName = "Object";
-    Float64 myValue = 4531.4578;
-    MyClass2 obj = {};
+        bool myBool = false;
+        String myName = "Object";
+        Float64 myValue = 4531.4578;
+        MyClass2 obj = {};
     
-};
+    };
 
-template<>
-class Serializer<MyClass> {
+    template<>
+    class Serializer<MyClass> {
 
-public:
+    public:
     
-    static void serialize(Json::Object& archive, MyClass const& object) {
-        
-        archive.add("myBool", object.myBool);
-        archive.add("myName", object.myName);
-        archive.add("myValue", object.myValue);
-        archive.add("obj", object.obj);
-        
-    }
-        
-    static MyClass deserialize(Json::Object const& object) {
+        static void serialize(Container* container, MyClass const& object) {
 
-        MyClass obj;
-
-        obj.myBool = object.getBool("myBool");
-        obj.myName = object.getString("myName");
-        obj.myValue = object.getFloat<Float64>("myValue");
-        obj.obj = object.getObject<MyClass2>("obj");
-
-        return obj;
+            container->add("myBool", object.myBool);
+            container->add("myName", object.myName);
+            container->add("myValue", object.myValue);
+            container->add("obj", object.obj);
         
-    }
+        }
+        
+        static MyClass deserialize(Container* container) {
+
+            MyClass cl;
+            
+            cl.obj = container->get<MyClass2>("obj");
+            cl.myBool = container->get<bool>("myBool");
+            cl.myName = container->get<String>("myName");
+            cl.myValue = container->get<Float64>("myValue");
+            
+            return cl;
+        
+        }
     
-};
+    };
 
-template<>
-class Serializer<MyClass2> {
+    template<>
+    class Serializer<MyClass2> {
 
-public:
+    public:
     
-    static void serialize(Json::Object& archive, MyClass2 const& object) {
+        static void serialize(Container* container, MyClass2 const& object) {
         
-        archive.add("myInts", object.myInts);
-        archive.add("objects", object.objects);
+            container->add("myInts", object.myInts);
+            container->add("objects", object.objects);
         
-    }
+        }
 
         
-    static MyClass2 deserialize(Json::Object const& object) {
-        
-        MyClass2 obj;
+        static MyClass2 deserialize(Container* container) {
 
-        obj.myInts = object.getArray<int>("myInts");
-        obj.objects = object.getArray<MyClass3>("objects");
+            MyClass2 obj;
 
-        return obj;
+            obj.myInts = container->get<MutableArray<int>>("myInts");
+            obj.objects = container->getArray<MyClass3>("objects");
+            
+            return obj;
         
-    }
+        }
     
-};
+    };
 
-template<>
-class Serializer<MyClass3> {
+    template<>
+    class Serializer<MyClass3> {
 
-public:
+    public:
     
-    static void serialize(Json::Object& archive, MyClass3 const& object) {
+        static void serialize(Container* archive, MyClass3 const& object) {
         
-        archive.add("field",  Random::randomInteger(0, 500));
+            archive->add("field", object.field);
         
-    }
+        }
+        
+        static MyClass3 deserialize(Container* object) {
 
-        
-    static MyClass3 deserialize(Json::Object const& object) {
-        
-        MyClass3 obj;
+            MyClass3 cool;
 
-        obj.field = object.getInteger<int>("field");
-
-        return obj;
+            cool.field = object->get<int>("field");
+            
+            return cool;
         
-    }
+        }
     
-};
-
+    };
+    
+}
 
 int main(int argc, const char** argv) {
-    
-    MyClass cool;
-    Json json1;
-    auto obj = Json::Object("root");
-    
-    Serializer<MyClass>::serialize(obj, cool);
 
-    json1.rootObject.add(obj);
+    Json json = Json::parse("example_1.json");
     
-    MyClass cl = Serializer<MyClass>::deserialize(obj);
-    
-    Json json2;
-    auto obj2 = Json::Object("root");
-    Serializer<MyClass>::serialize(obj2, cl);
-    json2.rootObject.add(obj2);
-
-    json2.write("object.json");
-    
-    system("start object.json");
-    
-    Json json = Json::parse("example_2.json");
     json.write("copy.json");
-    system("start copy.json");
 
+    MyClass obj;
+    
+    Archive archive;
+
+    Serializer<MyClass>::serialize(archive.rootContainer(), obj);
+    
+    auto obj2 = Serializer<MyClass>::deserialize(archive.rootContainer());
+
+    archive.reset();
+
+    Serializer<MyClass>::serialize(archive.rootContainer(), obj2);
+
+    auto obj3 = Serializer<MyClass>::deserialize(archive.rootContainer());
+    
+    Json(archive).write("object.json");
+
+    assert(obj2 == obj3);
+
+    system("start object.json");
+    system("start copy.json");
+    
     return 0;
     
     ExceptionHandler::run([&](){
