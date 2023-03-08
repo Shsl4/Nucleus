@@ -12,7 +12,7 @@ namespace Nucleus {
 
     class String final : public Collection<char> {
 
-        using Super = Collection<char>;
+        using Super = Collection;
 
     public:
 
@@ -31,9 +31,7 @@ namespace Nucleus {
         String(size_t cap, char data);
 
         String(const char* cString);
-
-        String(const unsigned char* cString);
-
+        
         String(const char* buf, size_t size);
         
         String& operator=(String const& other);
@@ -43,14 +41,18 @@ namespace Nucleus {
         String operator+(String const& other) const;
 
         String& operator+=(String const& other);
+        
+        bool operator==(String const& other) const;
+
+        bool operator==(const char* other) const;
 
         auto add(const char &element) -> decltype(*this) & override;
 
-        auto addAll(const Collection<char> &collection) -> decltype(*this) & override;
+        auto addAll(const Collection &collection) -> decltype(*this) & override;
 
         auto insert(const char &element, size_t index) -> decltype(*this) & override;
 
-        auto insertAll(const Collection<char> &collection, size_t index) -> decltype(*this) & override;
+        auto insertAll(const Collection &collection, size_t index) -> decltype(*this) & override;
 
         bool removeAt(size_t index) override;
 
@@ -60,31 +62,29 @@ namespace Nucleus {
 
         String& addMem(const char* mem, size_t size);
 
-        bool operator==(String const& other) const;
-
-        bool operator==(const char* other) const;
-
         String& insertAll(const char* string, size_t index);
         
         String& removeOccurrences(String const& other);
+        
+        String& replaceOccurrences(String const& of, String const& with); 
 
         void clear() override;
         
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
         
-        template<typename T>
+        template<typename T> requires std::is_integral_v<T>
         static String fromInteger(T const& integral, size_t base = 10);
 
-        template<typename T>
+        template<typename T> requires std::is_floating_point_v<T>
         static String fromFloatingPoint(T const& fp);
 
         template<typename T>
         static String fromPointer(const T* pointer);
 
-        NODISCARD Super::Iterator begin() const override;
+        NODISCARD Iterator begin() const override;
 
-        NODISCARD Super::Iterator end() const override;
+        NODISCARD Iterator end() const override;
 
         NODISCARD char& get(size_t index) const override;
 
@@ -110,7 +110,13 @@ namespace Nucleus {
 
         NODISCARD Float64 toFloat64() const;
 
-        bool toInteger(Int64& out) const noexcept;
+        NODISCARD bool toBool() const;
+
+        NODISCARD String toLower() const;
+        
+        bool noThrowToInteger(Int64& out) const noexcept;
+        
+        NODISCARD Int64 toInteger() const;
 
         NODISCARD static bool isInteger(const char c) {
             return c >= L'0' && c <= L'9';
@@ -135,7 +141,7 @@ namespace Nucleus {
         template<typename T>
         static String formatArgument(size_t n, String const& parameters, T const& element);
         
-        void extend(const size_t size);
+        void extend(size_t size);
                 
         char* buffer = nullptr;
         size_t count = 0;

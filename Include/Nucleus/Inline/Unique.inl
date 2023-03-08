@@ -36,7 +36,7 @@ namespace Nucleus{
     template<typename... Args>
     Unique<T> Unique<T>::make(Args &&... args) {
 
-        Unique<T> unique;
+        Unique unique;
         unique.object = Allocator<T>::construct(std::forward<Args>(args)...);
         return unique;
 

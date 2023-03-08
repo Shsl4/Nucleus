@@ -5,12 +5,13 @@
 #include <Nucleus/MutableArray.h>
 #include <Nucleus/Exceptions.h>
 #include <iterator>
-#include <stdexcept>
 
 namespace Nucleus {
 
     template <typename KeyType, typename ValueType>
     class Map {
+
+    public:
         
         class Entry {
 
@@ -18,31 +19,29 @@ namespace Nucleus {
 
             Entry() = default;
 
-            Entry(KeyType const& t, ValueType const& y) : key(t), value(y) {
+            Entry(KeyType const& t, ValueType const& y) : keyObject(t), valueObject(y) {
 
             }
 
-            Entry(KeyType&& t, ValueType&& y) : key(std::move(t)), value(std::move(y)) {
+            Entry(KeyType&& t, ValueType&& y) : keyObject(std::move(t)), valueObject(std::move(y)) {
 
             }
 
-            NODISCARD FORCEINLINE KeyType const& getKey() const { return key; }
+            NODISCARD FORCEINLINE KeyType const& key() const { return keyObject; }
 
-            NODISCARD FORCEINLINE ValueType const& getValue() const { return value; }
+            NODISCARD FORCEINLINE ValueType const& value() const { return valueObject; }
 
-            NODISCARD FORCEINLINE ValueType& getValue() { return value; }
+            NODISCARD FORCEINLINE ValueType& value() { return valueObject; }
 
         private:
 
             friend Map;
             
-            KeyType key{};
-            ValueType value{};
+            KeyType keyObject {};
+            ValueType valueObject {};
 
         };
-    
-    public:
-
+        
         class Iterator {
 
         public:
@@ -69,7 +68,7 @@ namespace Nucleus {
                 return ptr;
             }
 
-            reference operator++() { ++ptr; return *ptr; }
+            reference operator++() { return *++ptr; }
 
             friend bool operator== (const Iterator& a, const Iterator& b) { return a.ptr == b.ptr; }
             friend bool operator!= (const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; }
@@ -84,21 +83,19 @@ namespace Nucleus {
 
         ~Map() {
 
-            this->count = 0;
-            this->capacity = 0;
-            Allocator<Entry>::release(buffer);
+            reset();
 
         }
 
-        explicit Map(size_t cap) : capacity(cap){
-            this->buffer = Allocator<Entry>::allocate(capacity);
+        explicit Map(size_t cap) : storage(cap){
+            this->buffer = Allocator<Entry>::allocate(storage);
         }
 
         Map(std::initializer_list<Entry> list){
 
-            this->capacity = list.size();
+            this->storage = list.size();
             this->count = list.size();
-            this->buffer = Allocator<Entry>::allocate(capacity);
+            this->buffer = Allocator<Entry>::allocate(storage);
             Allocator<Entry>::copy(list.begin(), list.end(), buffer);
 
         }
@@ -114,8 +111,8 @@ namespace Nucleus {
         ValueType& operator[](KeyType const& key) {
 
             for(auto& p: *this){
-                if(p.key == key){
-                    return p.getValue();
+                if(p.key() == key){
+                    return p.value();
                 }
             }
 
@@ -126,8 +123,8 @@ namespace Nucleus {
         ValueType& operator[](KeyType const& key) const {
 
             for(auto& p: *this){
-                if(p.key == key){
-                    return p.getValue();
+                if(p.key() == key){
+                    return p.value();
                 }
             }
 
@@ -149,11 +146,11 @@ namespace Nucleus {
 
             const Entry* start = other.begin().get();
             
-            Allocator<Entry>::reallocate(buffer, capacity, other.capacity);
-            Allocator<Entry>::copy(start, start + other.capacity, buffer);
+            Allocator<Entry>::reallocate(buffer, storage, other.storage);
+            Allocator<Entry>::copy(start, start + other.storage, buffer);
 
             this->count = other.count;
-            this->capacity = other.capacity;
+            this->storage = other.storage;
             
             return *this;
             
@@ -167,11 +164,11 @@ namespace Nucleus {
 
             this->buffer = other.buffer;
             this->count = other.count;
-            this->capacity = other.capacity;
+            this->storage = other.storage;
 
             other.buffer = nullptr;
             other.count = 0;
-            other.capacity = 0;
+            other.storage = 0;
             
             return *this;
             
@@ -189,7 +186,7 @@ namespace Nucleus {
 
             for(size_t i = 0; i < count; ++i){
 
-                if(buffer[i].key == key) {
+                if(buffer[i].key() == key) {
 
                     Allocator<Entry>::move(buffer + i + 1, buffer + count, buffer + i);
                     --count;
@@ -205,22 +202,29 @@ namespace Nucleus {
 
         bool add(Entry const& element) {
 
-            if(containsKey(element.key)) return false;
+            if(containsKey(element.key())) return false;
 
             checkSize();
-            buffer[count] = element;
-            ++count;
+            buffer[count++] = element;
 
             return true;
 
         }
 
-        bool getValueByKey(KeyType const& key, ValueType& out) const {
+        void reset() {
+
+            this->count = 0;
+            this->storage = 0;
+            Allocator<Entry>::release(buffer);
+
+        }
+
+        bool valueByKey(KeyType const& key, ValueType& out) const {
 
             for(auto const& p: *this){
 
-                if(p.key == key){
-                    out = p.getValue();
+                if(p.key() == key){
+                    out = p.value();
                     return true;
                 }
 
@@ -232,24 +236,30 @@ namespace Nucleus {
 
         bool add(Entry&& element) {
 
-            if(containsKey(element.key)) return false;
+            if(containsKey(element.key())) return false;
 
             checkSize();
-            buffer[count] = std::move(element);
-            ++count;
+            buffer[count++] = std::move(element);
 
             return true;
 
         }
+
+        NODISCARD FORCEINLINE Entry& get(size_t index) const {
+
+            assert(index < count);
+            return buffer[index];
+            
+        }
         
-        MutableArray<KeyType> getKeysByValue(ValueType const& value) const {
+        NODISCARD MutableArray<KeyType> keysByValue(ValueType const& value) const {
 
             MutableArray<KeyType> arr;
 
             for(auto const& p: *this){
 
-                if(p.getValue() == value){
-                    arr += p.key;
+                if(p.value() == value){
+                    arr += p.key();
                 }
 
             }
@@ -258,11 +268,11 @@ namespace Nucleus {
 
         }
         
-        bool containsKey(KeyType const& key) const {
+        NODISCARD bool containsKey(KeyType const& key) const {
 
             for(Entry const& p : *this){
 
-                if(key == p.key) {
+                if(key == p.key()) {
 
                     return true;
 
@@ -274,46 +284,47 @@ namespace Nucleus {
 
         }
 
-        MutableArray<KeyType> getKeys() const {
+        NODISCARD MutableArray<KeyType> keys() const {
 
             MutableArray<KeyType> arr;
 
             for(auto const& p: *this){
-                arr += p.key;
+                arr += p.key();
             }
 
             return arr;
 
         }
 
-        MutableArray<ValueType> getValues() const {
+        NODISCARD MutableArray<ValueType> values() const {
 
             MutableArray<ValueType> arr;
 
             for(auto const& p: *this){
-                arr += p.getValue();
+                arr += p.value();
             }
 
             return arr;
 
         }
 
-        FORCEINLINE size_t getCount() const { return count; }
+        NODISCARD FORCEINLINE size_t size() const { return count; }
 
-        FORCEINLINE size_t getCapacity() const { return capacity; }
+        NODISCARD FORCEINLINE size_t capacity() const { return storage; }
 
-        Iterator begin() const { return Iterator(buffer); }
-        Iterator end() const { return Iterator(buffer + count); }
+        NODISCARD Iterator begin() const { return Iterator(buffer); }
+        
+        NODISCARD Iterator end() const { return Iterator(buffer + count); }
         
     private:
 
         void checkSize(size_t size = 1){
 
-            if(count + size > capacity){
+            if(count + size > storage){
 
-                const size_t newSize = capacity > 0 ? capacity * 2 : 5;
-                Allocator<Entry>::reallocate(buffer, capacity, newSize);
-                capacity = newSize;
+                const size_t newSize = storage > 0 ? storage * 2 : 5;
+                Allocator<Entry>::reallocate(buffer, storage, newSize);
+                storage = newSize;
 
             }
 
@@ -321,7 +332,7 @@ namespace Nucleus {
 
         Entry* buffer = nullptr;
         size_t count = 0;
-        size_t capacity = 0;
+        size_t storage = 0;
 
     };
 

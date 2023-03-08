@@ -11,6 +11,8 @@ namespace Nucleus {
 
     public:
 
+        using SubType = T;
+
         MutableArray() = default;
 
         explicit MutableArray(size_t size);
@@ -54,7 +56,6 @@ namespace Nucleus {
         void clear() override;
 
         auto intersect(Collection<T> const& other) -> MutableArray;
-
 
         NODISCARD bool isEmpty() const override;
 

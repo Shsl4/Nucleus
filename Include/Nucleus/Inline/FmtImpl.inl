@@ -13,13 +13,18 @@ namespace Nucleus {
     public:
 
         static String format(String const& string, String const& params) {
+            
+            if(params == "q") {
+                String str = String(string.size() + 2);
+                str.insert('\"', 0);
+                str += string;
+                str.insert('\"', str.size());
+                return str;
+            }
+            
             return string;
         }
-
-        static String& format(String& string, String const& params) {
-            return string;
-        }
-
+        
     };
 
     template<>
@@ -110,18 +115,6 @@ namespace Nucleus {
 
     };
 
-    template<>
-    class Fmt<const unsigned char*> {
-
-    public:
-
-        static String format(const unsigned char* elem, String const& params) {
-            return elem;
-        }
-
-
-    };
-
     template<size_t n>
     class Fmt<char[n]> {
 
@@ -186,7 +179,7 @@ namespace Nucleus {
 
             if (array.isEmpty()) return "[]";
 
-            String result = "[";
+            String result = "[ ";
 
             using Iterator = typename ArrayType<T, sz>::Iterator;
             using Type = typename Iterator::value_type;
@@ -195,7 +188,7 @@ namespace Nucleus {
                 result += Fmt<Type>::format(array[i], params) + ", ";
             }
 
-            result += Fmt<Type>::format(array[array.size() - 1], params) + "]";
+            result += Fmt<Type>::format(array[array.size() - 1], params) + " ]";
 
             return result;
 
@@ -212,7 +205,7 @@ namespace Nucleus {
 
             if (array.isEmpty()) return "[]";
 
-            String result = "[";
+            String result = "[ ";
             
             using Iterator = typename CollectionType<T>::Iterator;
             using Type = typename Iterator::value_type;
@@ -221,7 +214,7 @@ namespace Nucleus {
                 result += Fmt<Type>::format(array[i], params) + ", ";
             }
             
-            result += Fmt<Type>::format(array[array.size() - 1], params) + "]";
+            result += Fmt<Type>::format(array[array.size() - 1], params) + " ]";
             
             return result;
             

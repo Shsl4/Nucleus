@@ -42,21 +42,6 @@ namespace Nucleus{
 
     }
 
-    String::String(const unsigned char* cString) {
-
-        if (!cString) { return; }
-
-        const size_t stringSize = strlen(reinterpret_cast<char const*>(cString)) + 1;
-        this->buffer = Allocator<char>::allocate(stringSize);
-
-        Allocator<unsigned char>::copy(cString, cString + stringSize, reinterpret_cast<unsigned char*>(buffer));
-
-        this->count = this->storage = stringSize;
-
-        this->buffer[stringSize - 1] = '\0';
-
-    }
-
     String::String(std::string const& string) {
 
         const size_t stringSize = string.size() + 1;
@@ -297,7 +282,7 @@ namespace Nucleus{
         return *this;
 
     }
-
+    
     MutableArray<String> String::split(String const& separators) const {
 
         MutableArray<String> components;
@@ -502,7 +487,7 @@ namespace Nucleus{
 
         }
 
-        if(dotIndex == -1) { Int64 o = 0; toInteger(o); return static_cast<Float64>(o); }
+        if(dotIndex == -1) { return static_cast<Float64>(toInteger()); }
 
         for(Int64 i = negative; i < max; ++i){
 
@@ -530,7 +515,33 @@ namespace Nucleus{
 
     }
 
-    bool String::toInteger(Int64& out) const noexcept {
+    bool String::toBool() const {
+
+        if(*this == "0") return false;
+        if(*this == "1") return true;
+        
+        const String copy = toLower();
+        
+        if (copy == "true") return true;
+        if (copy == "false") return false;
+
+        throw Exceptions::ParseError("This string does not represent a bool.");
+        
+    }
+
+    String String::toLower() const {
+
+        String copy = *this;
+
+        for (auto& e : copy) {
+            e = tolower(e);
+        }
+
+        return copy;
+        
+    }
+
+    bool String::noThrowToInteger(Int64& out) const noexcept {
 
         if(size() == 0) return false;
 
@@ -552,6 +563,30 @@ namespace Nucleus{
         
         return true;
 
+    }
+
+    Int64 String::toInteger() const {
+
+        if(size() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
+
+        const size_t max = size();
+        const bool negative = buffer[0] == '-';
+        Int64 value = 0;
+
+        for(size_t i = negative; i < max; ++i){
+
+            if(!isInteger(buffer[i])) {
+                throw Exceptions::ParseError("Failed to parse: String does not represent a number.");
+            }
+
+            value += static_cast<Int64>(charToInteger(buffer[i]) * std::pow(10, count - i - 2));
+
+        }
+
+        if (negative) { value = -value; }
+        
+        return value;
+        
     }
 
 

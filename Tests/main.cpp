@@ -21,7 +21,208 @@ public:
 
 };
 
+namespace Nucleus {
+    
+    class MyClass4 {
+
+    public:
+        bool operator==(const MyClass4& other) const {
+            return name == other.name;
+        }
+
+        String name = "Data";
+        
+    };
+
+    class MyClass3 {
+
+    public:
+    
+        bool operator==(const MyClass3& other) const {
+            return field == other.field;
+        }
+
+        int field = 0;
+        MutableArray<String> strings = { "first", "second", "third" }; 
+        MutableArray<MutableArray<MyClass4>> strings2 = { { {} }, { {} }, { {} } }; 
+        MutableArray<Float64> data = { Random::randomFloat(0.0, 1000.0), Random::randomFloat(0.0, 1000.0), Random::randomFloat(0.0, 1000.0) }; 
+    
+    };
+
+
+    class MyClass2 {
+
+    public:
+
+        bool operator==(const MyClass2& other) const {
+
+            return myInts == other.myInts
+                && objects == other.objects;
+            
+        }
+    
+        MutableArray<int> myInts = { 1, 2, 5, 6, 8 };
+        MutableArray<MyClass3> objects = { {}, {}, {}, {} };
+    
+    };
+
+    class MyClass {
+
+    public:
+
+        bool operator==(const MyClass& other) const {
+
+            return myBool == other.myBool
+                && myName == other.myName
+                && Math::deq(myValue, other.myValue)
+                && obj == other.obj;
+            
+        }
+    
+        bool myBool = false;
+        String myName = "Object";
+        Float64 myValue = 4531.4578;
+        MyClass2 obj = {};
+    
+    };
+
+    template<>
+    class Serializer<MyClass2> {
+
+    public:
+    
+        static void serialize(Container* container, MyClass2 const& object) {
+        
+            container->add("myInts", object.myInts);
+            container->add("objects", object.objects);
+        
+        }
+
+        
+        static MyClass2 deserialize(Container* container) {
+
+            MyClass2 obj;
+
+            obj.myInts = container->get<MutableArray<int>>("myInts");
+            obj.objects = container->get<MutableArray<MyClass3>>("objects");
+            
+            return obj;
+        
+        }
+    
+    };
+    
+    template<>
+    class Serializer<MyClass> {
+
+    public:
+    
+        static void serialize(Container* container, MyClass const& object) {
+
+            container->add("myBool", object.myBool);
+            container->add("myName", object.myName);
+            container->add("myValue", object.myValue);
+            container->add("obj", object.obj);
+        
+        }
+        
+        static MyClass deserialize(Container* container) {
+
+            MyClass cl;
+            
+            cl.obj = container->get<MyClass2>("obj");
+            cl.myBool = container->get<bool>("myBool");
+            cl.myName = container->get<String>("myName");
+            cl.myValue = container->get<Float64>("myValue");
+            
+            return cl;
+        
+        }
+    
+    };
+
+    template<>
+    class Serializer<MyClass3> {
+
+    public:
+    
+        static void serialize(Container* archive, MyClass3 const& object) {
+        
+            archive->add("field", object.field);
+            archive->add("strings", object.strings);
+            archive->add("strings2", object.strings2);
+            archive->add("data", object.data);
+        
+        }
+        
+        static MyClass3 deserialize(Container* object) {
+
+            MyClass3 cool;
+
+            cool.field = object->get<int>("field");
+            cool.strings = object->get<MutableArray<String>>("strings");
+            cool.strings2 = object->get<MutableArray<MutableArray<MyClass4>>>("strings2");
+            cool.data = object->get<MutableArray<Float64>>("data");
+            
+            return cool;
+        
+        }
+    
+    };
+
+    template<>
+    class Serializer<MyClass4> {
+
+    public:
+    
+        static void serialize(Container* archive, MyClass4 const& object) {
+        
+            archive->add("name", object.name);
+
+        }
+        
+        static MyClass4 deserialize(Container* object) {
+
+            MyClass4 cool;
+
+            cool.name = object->get<String>("name");
+           
+            return cool;
+        
+        }
+    
+    };
+
+    
+    
+}
+
+
 int main(int argc, const char** argv) {
+    
+    MyClass obj;
+
+    Json json;
+    
+    Archive& archive = json.archive();
+
+    Serializer<MyClass>::serialize(archive.rootContainer(), obj);
+
+    MyClass obj2 = Serializer<MyClass>::deserialize(archive.rootContainer());
+
+    json.archive().reset();
+    
+    Serializer<MyClass>::serialize(archive.rootContainer(), obj2);
+    
+    json.write("object.json");
+
+    json.archive().reset();
+    
+    Json j = Json::parse("object.json");
+
+    MyClass obj3 = Serializer<MyClass>::deserialize(j.archive().rootContainer());
+    
+    j.write("object.json");
     
     ExceptionHandler::run([&](){
 
