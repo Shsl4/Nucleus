@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifdef SERIALIZATION_INLINE
 
@@ -41,7 +41,7 @@ class Serializer<MutableArray<T>> {
             
         }
         
-        static MutableArray<T> deserialize(Container* container) requires !Serializable<T> {
+        static MutableArray<T> deserialize(Container* container) requires (!Serializable<T>) {
 
             if(const auto arr = dynamic_cast<ArrayContainer*>(container)) {
 

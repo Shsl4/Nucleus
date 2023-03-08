@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Nucleus/String.h>
 #include <Nucleus/Function.h>
@@ -28,7 +28,7 @@ namespace Nucleus {
 
         static Json parse(String const& fileName);
 
-        NODISCARD void write(String const& fileName) const;
+        void write(String const& fileName) const;
 
         NODISCARD FORCEINLINE Archive& archive() { return this->storage; }
         

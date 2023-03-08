@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifdef CONTAINER_INL
 
@@ -14,7 +14,7 @@ namespace Nucleus {
             
     }
 
-    template <typename T> requires !HasFmt<T>::value
+    template <typename T> requires (!HasFmt<T>::value)
     void Container::add(String const& name, T const& element) {
             
         Container* container = objectContainer(name);
@@ -42,7 +42,7 @@ namespace Nucleus {
             
     }
 
-    template <typename T> requires !HasFmt<T>::value
+    template <typename T> requires (!HasFmt<T>::value)
     T Container::get(String const& name) const {
             
         if(Container* container = findContainer(name)) {
@@ -53,7 +53,7 @@ namespace Nucleus {
             
     }
 
-    template <typename T> requires !std::is_same_v<Lowest<T>, T>
+    template <typename T> requires (!std::is_same_v<Lowest<T>, T>)
     T Container::get(String const& name) const {
             
         if(Container* container = findArrayContainer(name)) {

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Nucleus/Serialization/Storage.h>
 #include <Nucleus/SmartArray.h>
@@ -12,7 +12,7 @@ namespace Nucleus {
         template<typename T> requires HasFmt<T>::value
         void add(String const& name, T const& element);
 
-        template<typename T> requires !HasFmt<T>::value
+        template<typename T> requires (!HasFmt<T>::value)
         void add(String const& name, T const& element);
 
         template<template<class T> class Array, typename T>
@@ -21,10 +21,10 @@ namespace Nucleus {
         template<class T>
         T get(String const& name) const;
 
-        template<typename T> requires !HasFmt<T>::value
+        template<typename T> requires (!HasFmt<T>::value)
         T get(String const& name) const;
 
-        template<typename T> requires !std::is_same_v<Lowest<T>, T>
+        template<typename T> requires (!std::is_same_v<Lowest<T>, T>)
         T get(String const& name) const;
 
         Container* objectContainer(String const& name);
@@ -53,7 +53,7 @@ namespace Nucleus {
 
         ArrayContainer() = default;
 
-        NODISCARD FORCEINLINE SmartArray<Storage> const& dataArray() const;
+        NODISCARD FORCEINLINE SmartArray<Storage> const& dataArray() const { return this->data; }
 
         NODISCARD ArrayContainer* duplicate() const override;
 

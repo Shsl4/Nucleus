@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <Nucleus/Fmt.h>
+#include <sstream>
 
 namespace Nucleus {
 

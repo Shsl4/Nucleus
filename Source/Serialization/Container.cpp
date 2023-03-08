@@ -1,8 +1,6 @@
-﻿#include <Nucleus/Serialization/Container.h>
+#include <Nucleus/Serialization/Container.h>
 
 namespace Nucleus {
-
-    SmartArray<Storage> const& ArrayContainer::dataArray() const { return this->data; }
     
     ArrayContainer* ArrayContainer::duplicate() const {
 
