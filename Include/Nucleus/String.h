@@ -12,7 +12,7 @@ namespace Nucleus {
 
     class String final : public Collection<char> {
 
-        using Super = Collection<char>;
+        using Super = Collection;
 
     public:
 
@@ -31,9 +31,7 @@ namespace Nucleus {
         String(size_t cap, char data);
 
         String(const char* cString);
-
-        String(const unsigned char* cString);
-
+        
         String(const char* buf, size_t size);
         
         String& operator=(String const& other);
@@ -67,6 +65,8 @@ namespace Nucleus {
         String& insertAll(const char* string, size_t index);
         
         String& removeOccurrences(String const& other);
+        
+        String& replaceOccurrences(String const& of, String const& with); 
 
         void clear() override;
         
@@ -116,7 +116,7 @@ namespace Nucleus {
         
         bool noThrowToInteger(Int64& out) const noexcept;
         
-        bool toInteger(Int64& out) const;
+        NODISCARD Int64 toInteger() const;
 
         NODISCARD static bool isInteger(const char c) {
             return c >= L'0' && c <= L'9';

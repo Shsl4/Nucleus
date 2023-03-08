@@ -13,13 +13,18 @@ namespace Nucleus {
     public:
 
         static String format(String const& string, String const& params) {
+            
+            if(params == "q") {
+                String str = String(string.size() + 2);
+                str.insert('\"', 0);
+                str += string;
+                str.insert('\"', str.size());
+                return str;
+            }
+            
             return string;
         }
-
-        static String& format(String& string, String const& params) {
-            return string;
-        }
-
+        
     };
 
     template<>
@@ -105,18 +110,6 @@ namespace Nucleus {
 
         static String format(std::string const& elem, String const& params) {
             return elem.c_str();
-        }
-
-
-    };
-
-    template<>
-    class Fmt<const unsigned char*> {
-
-    public:
-
-        static String format(const unsigned char* elem, String const& params) {
-            return elem;
         }
 
 

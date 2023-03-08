@@ -26,8 +26,8 @@
 #include <Nucleus/Bench.h>
 #include <Nucleus/ExceptionHandler.h>
 #include <Nucleus/File.h>
-#include <Nucleus/Json.h>
-#include <Nucleus/Archive.h>
+#include <Nucleus/Serialization/Json.h>
+#include <Nucleus/Serialization/Archive.h>
 #include <Nucleus/Math.h>
 
 #include <Nucleus/Console.h>

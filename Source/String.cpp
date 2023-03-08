@@ -42,21 +42,6 @@ namespace Nucleus{
 
     }
 
-    String::String(const unsigned char* cString) {
-
-        if (!cString) { return; }
-
-        const size_t stringSize = strlen(reinterpret_cast<char const*>(cString)) + 1;
-        this->buffer = Allocator<char>::allocate(stringSize);
-
-        Allocator<unsigned char>::copy(cString, cString + stringSize, reinterpret_cast<unsigned char*>(buffer));
-
-        this->count = this->storage = stringSize;
-
-        this->buffer[stringSize - 1] = '\0';
-
-    }
-
     String::String(std::string const& string) {
 
         const size_t stringSize = string.size() + 1;
@@ -297,7 +282,7 @@ namespace Nucleus{
         return *this;
 
     }
-
+    
     MutableArray<String> String::split(String const& separators) const {
 
         MutableArray<String> components;
@@ -502,7 +487,7 @@ namespace Nucleus{
 
         }
 
-        if(dotIndex == -1) { Int64 o = 0; toInteger(o); return static_cast<Float64>(o); }
+        if(dotIndex == -1) { return static_cast<Float64>(toInteger()); }
 
         for(Int64 i = negative; i < max; ++i){
 
@@ -580,7 +565,7 @@ namespace Nucleus{
 
     }
 
-    bool String::toInteger(Int64& out) const {
+    Int64 String::toInteger() const {
 
         if(size() == 0) throw Exceptions::ParseError("Cannot parse an empty string");
 
@@ -599,10 +584,8 @@ namespace Nucleus{
         }
 
         if (negative) { value = -value; }
-
-        out = value;
         
-        return true;
+        return value;
         
     }
 
