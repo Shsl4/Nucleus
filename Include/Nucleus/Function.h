@@ -21,6 +21,16 @@ namespace Nucleus {
 
         Function() = default;
 
+        explicit operator bool() const { return callable; }
+
+        bool operator==(Function const& other) const{
+            return this->callable == other.callable;
+        }
+
+        Function(nullptr_t) {
+
+        }
+
         Function(FunctionType func) : callable(Shared<Derived<FunctionType>>::make(func)) {
 
         }
@@ -77,6 +87,8 @@ namespace Nucleus {
         using ArgType = std::tuple_element_t<n, std::tuple<Args...>>;
 
         Function() = default;
+
+        explicit operator bool() const { return function != nullptr; }
 
         Function(FunctionType func) : function(func) {
 

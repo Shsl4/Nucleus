@@ -53,6 +53,11 @@ namespace Nucleus {
             return a > b ? ((a > c) ? a : c) : ((b > c) ? b : c);
         }
 
+        template<typename NumberType>
+        FORCEINLINE static NumberType min(NumberType a, NumberType b, NumberType c) {
+            return a < b ? ((a < c) ? a : c) : ((b < c) ? b : c);
+        }
+
         FORCEINLINE static float cot(const float x) {
             return std::cos(x) / std::sin(x);
         }

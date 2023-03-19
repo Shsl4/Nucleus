@@ -9,6 +9,6 @@ then mkdir .cmake
 fi
 
 cd .cmake
-cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake .. -G Xcode
 cd ..
 ln -sf .cmake/Nucleus.xcodeproj Nucleus.xcodeproj

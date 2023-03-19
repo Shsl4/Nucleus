@@ -14,9 +14,7 @@ $CMakeDir.attributes = 'Hidden'
 
 Set-Location -Path $CMakeDirName
 
-$VcpkgPath="$env:USERPROFILE\vcpkg\scripts\buildsystems\vcpkg.cmake"
-
-cmake .. -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE="$VcpkgPath"
+cmake .. -G "Visual Studio 17 2022"
 
 Set-location ..
 
