@@ -26,6 +26,10 @@ namespace Nucleus {
 
     }
 
+    inline String String::format(String const& fmt) {
+        return fmt;
+    }
+    
     template<typename... Args>
     String String::format(String const& fmt, Args&&... args) {
 
@@ -114,10 +118,17 @@ namespace Nucleus {
     }
 
     template <typename T> requires std::is_floating_point_v<T>
-    String String::fromFloatingPoint(T const& fp) {
+    String String::fromFloatingPoint(T const& fp, Int64 precision) {
 
         std::stringstream stringstream;
+        
+        if(precision > 0) {
+            stringstream.setf(std::ios::fixed);
+            stringstream.precision(precision);
+        }
+
         stringstream << fp;
+        
         return stringstream.str().c_str();
             
     }

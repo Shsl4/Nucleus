@@ -73,11 +73,13 @@ namespace Nucleus {
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
         
+        static inline String format(String const& fmt);
+        
         template<typename T> requires std::is_integral_v<T>
         static String fromInteger(T const& integral, size_t base = 10);
 
         template<typename T> requires std::is_floating_point_v<T>
-        static String fromFloatingPoint(T const& fp);
+        static String fromFloatingPoint(T const& fp, Int64 precision = 0);
 
         template<typename T>
         static String fromPointer(const T* pointer);

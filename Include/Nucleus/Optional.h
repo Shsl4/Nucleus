@@ -23,6 +23,8 @@ namespace Nucleus {
 
         }
 
+        NODISCARD FORCEINLINE bool valid() const { return hasValue; }
+
         ~Optional() {
             if (hasValue) { storage.value.~T(); }
         }
@@ -31,9 +33,9 @@ namespace Nucleus {
 
         T const *get() const { return hasValue ? &storage.value : nullptr; }
 
-        T &operator*() { return *get(); }
+        T &operator*() { nthrowif(!hasValue, "Trying to access an empty oprional!"); return storage.value; }
 
-        T const &operator*() const { return *get(); }
+        T const &operator*() const { nthrowif(!hasValue, "Trying to access an empty oprional!"); return storage.value; }
 
         T* operator->() { return get(); }
 

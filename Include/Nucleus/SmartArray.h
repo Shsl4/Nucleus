@@ -14,6 +14,8 @@ namespace Nucleus {
 
         SmartArray();
 
+        explicit SmartArray(size_t capacity);
+
         SmartArray(SmartArray const& other);
 
         SmartArray(SmartArray&& other) noexcept;

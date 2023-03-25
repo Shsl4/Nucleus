@@ -61,7 +61,9 @@ namespace Nucleus {
     public:
 
         static String format(FloatingPoint elem, String const& params) {
-            return String::fromFloatingPoint(elem);
+            Int64 dec = 0;
+            params.noThrowToInteger(dec);
+            return String::fromFloatingPoint(elem, dec);
         }
 
 

@@ -42,6 +42,14 @@ namespace Nucleus {
     }
 
     template<class T>
+    SmartArray<T>::SmartArray(size_t capacity) : arraySize(0), arrayCapacity(capacity), buffer(Allocator<T*>::allocate(arrayCapacity)),
+                                  counter(Allocator<RefCounter>::construct()) {
+
+        this->counter->ref();
+
+    }
+
+    template<class T>
     SmartArray<T>::SmartArray(SmartArray &&other) noexcept {
 
         this->buffer = other.buffer;
