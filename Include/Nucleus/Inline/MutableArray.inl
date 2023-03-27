@@ -267,6 +267,28 @@ namespace Nucleus {
         return *this;
     }
 
+    template<class T>
+    MutableArray<T> MutableArray<T>::filled(size_t size) {
+        auto arr = MutableArray(size);
+        arr.bufferSize = arr.bufferCapacity;
+        return arr;
+    }
+
+    template<class T>
+    auto MutableArray<T>::intersect(const Collection<T> &other) -> MutableArray {
+
+        MutableArray array = {};
+
+        for(auto const& e : other){
+            if (this->contains(e) && !array.contains(e)){
+                array.add(e);
+            }
+        }
+
+        return array;
+
+    }
+
 
 }
 
