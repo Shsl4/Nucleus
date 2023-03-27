@@ -428,7 +428,10 @@ namespace Nucleus {
 
         String str;
         writeObject(storage.rootContainer(), str, nullptr, 0);
-        File::write(fileName, str);
+
+        if(File file; file.openForWriting(fileName)) {
+            file.write(str.begin().get(), str.size());
+        }
         
     }
 
@@ -436,7 +439,10 @@ namespace Nucleus {
 
         constexpr auto invalidString = "The file being parsed is an invalid JSON file.";
 
-        const String data = File::load(fileName);
+        File file;
+        file.load(fileName);
+        
+        const String data = file.data();
 
         if(data.isEmpty()) return {};
                 

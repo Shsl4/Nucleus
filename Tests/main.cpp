@@ -238,9 +238,13 @@ int main(int argc, const char** argv) {
 
     });
 
-    const auto data = File::load(argv[0]);
+    File file;
+    file.load(argv[0]);
+    const auto data = file.data();
 
-    File::write(String(argv[0]) + ".copy", data);
+    if(file.openForWriting(String(argv[0]) + ".copy")) {
+        file.write(data.begin().get(), data.size());
+    }
 
     int a = 5;
     void* b = nullptr;
