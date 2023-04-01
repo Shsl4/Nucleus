@@ -121,11 +121,9 @@ namespace Nucleus {
     String String::fromFloatingPoint(T const& fp, Int64 precision) {
 
         std::stringstream stringstream;
-        
-        if(precision > 0) {
-            stringstream.setf(std::ios::fixed);
-            stringstream.precision(precision);
-        }
+
+        stringstream.setf(std::ios::fixed);
+        stringstream.precision(precision);
 
         stringstream << fp;
         

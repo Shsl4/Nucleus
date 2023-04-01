@@ -36,7 +36,7 @@ namespace Nucleus {
         template<typename T> requires std::is_fundamental_v<T>
         MutableArray<T> readMultiple(size_t count) {
 
-            if(cursor + sizeof(T) * count > storage.size()) throwException("Error");
+            if(cursor + sizeof(T) * count > storage.size()) throwException("Trying to read past end of file.");
 
             MutableArray<T> arr = MutableArray<T>::filled(count);
 
@@ -53,7 +53,7 @@ namespace Nucleus {
         template<typename T> requires std::is_fundamental_v<T>
         T read() {
 
-            if(cursor + sizeof(T) > storage.size()) throwException("Error");
+            if(cursor + sizeof(T) > storage.size()) throwException("Trying to read past end of file.");
 
             const size_t pos = cursor;
 
@@ -66,7 +66,7 @@ namespace Nucleus {
         bool openForWriting(String const& filePath){
 
             // Create our file stream in binary mode.
-            std::ofstream fStream(filePath.begin().get(), std::ios::binary | std::ios::ate);
+            std::ofstream fStream(filePath.begin().get(), std::ios::binary | std::ios::ate | std::ios::trunc);
 
             // If the file does not exist or is inaccessible, return.
             if (!fStream.is_open()) { return false; }

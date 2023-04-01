@@ -46,5 +46,6 @@ namespace Nucleus {
 #define f64(x) static_cast<Nucleus::Float64>(x)
 #define i32(x) static_cast<Nucleus::Int32>(x)
 #define i64(x) static_cast<Nucleus::Int64>(x)
+#define st(x) static_cast<size_t>(x)
 #define nthrow(m) Nucleus::throwException(m)
 #define nthrowif(b, m) if(b) Nucleus::throwException(m)
