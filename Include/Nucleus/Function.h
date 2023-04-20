@@ -11,6 +11,8 @@ namespace Nucleus {
     template<typename ReturnType, typename... Args>
     class Function<ReturnType(Args...)> {
 
+        friend class Fmt<Function>;
+
     public:
 
         template<size_t n> requires (sizeof...(Args) > 0 && n < sizeof...(Args))
@@ -113,18 +115,6 @@ namespace Nucleus {
 
         FunctionType function = nullptr;
         Class* target = nullptr;
-
-    };
-
-    template<typename T>
-    class Fmt<Function<T>> {
-
-    public:
-
-        static String format(Function<T> const& f, String const& params) {
-            return Type::name(f) + " at " +
-                   Fmt<const void*>::format(*(const void**)(reinterpret_cast<const void*>(&f.func)), params);
-        }
 
     };
 

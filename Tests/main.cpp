@@ -21,6 +21,32 @@ public:
 
 };
 
+class Base {
+
+    REFL_BODY(Base)
+    
+public:
+    
+    virtual void hello() {
+        Console::log("Hello\n");
+    }
+    
+    virtual ~Base() = default;
+    
+};
+
+class Derived : public Base {
+
+    REFL_BODY(Derived)
+
+ public:
+    
+    void hello() override {
+        Console::log("Derived!!\n");
+    }
+    
+};
+
 namespace Nucleus {
     
     class MyClass4 {
@@ -192,8 +218,6 @@ namespace Nucleus {
         }
     
     };
-
-    
     
 }
 
@@ -284,6 +308,23 @@ int main(int argc, const char** argv) {
     constRef(objArr[0]);
 
     Console::log("{}\n", arr);
+
+    Derived* de = new Derived();
+    void* p = de;
+    Base* bb = static_cast<Base*>(p);
+    auto r = &*bb;
+    Console::log("{}\n", Type::name(*bb));
+    r->hello();
+
+    Console::log("{}\n", Type::name<Raw<int**************************************&&>>());
+    Console::log("{}\n", Type::name<Raw<decltype(r)>>());
+
+    Base** pp = &bb;
+
+    Class c = Class::of(pp);
+    void* d = c.unmanaged();
+
+    Console::log("{}: {}\n", c.name(), d);
     
     return 0;
 
