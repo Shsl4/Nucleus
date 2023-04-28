@@ -14,11 +14,11 @@ namespace Nucleus {
 
         void reset();
 
-        NODISCARD FORCEINLINE ObjectContainer* rootContainer() const { return this->root.pointer(); }
+        NODISCARD FORCEINLINE ObjectContainer* root() const { return this->container.pointer(); }
         
     private:
 
-        Unique<ObjectContainer> root = Unique<ObjectContainer>::make();
+        Unique<ObjectContainer> container = Unique<ObjectContainer>::make();
     
     };
     

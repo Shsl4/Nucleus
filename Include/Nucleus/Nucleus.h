@@ -31,3 +31,4 @@
 #include <Nucleus/Math.h>
 
 #include <Nucleus/Console.h>
+#include <Nucleus/Test.h>

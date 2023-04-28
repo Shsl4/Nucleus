@@ -123,7 +123,10 @@ namespace Nucleus {
         std::stringstream stringstream;
 
         stringstream.setf(std::ios::fixed);
-        stringstream.precision(precision);
+
+        if(precision > 0){
+            stringstream.precision(precision);
+        }
 
         stringstream << fp;
         

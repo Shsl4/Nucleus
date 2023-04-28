@@ -251,7 +251,7 @@ namespace Nucleus{
 
         size_t i = 0, j = 0;
 
-        while(i != size) {
+        while(i < size) {
 
             if(buffer[i] == other.buffer[j]) {
 
@@ -282,6 +282,48 @@ namespace Nucleus{
         return *this;
 
     }
+
+    String &String::replaceOccurrences(const String &of, const String &with) {
+
+        size_t size = this->size();
+        const size_t ofSize = of.size();
+
+        size_t i = 0, j = 0;
+
+        while(i < size) {
+
+            if(buffer[i] == of.buffer[j]) {
+
+                if(++j == ofSize) {
+
+                    const auto from = buffer + i + 1;
+                    const auto to = buffer + count;
+                    Allocator<char>::move(from, to, from - j);
+                    memset(to - j, '\0', j);
+                    this->count -= j;
+                    i -= j;
+                    j = 0;
+                    insertAll(with, i + 1);
+                    i += with.size();
+
+                }
+
+            }
+            else {
+
+                i -= j;
+                j = 0;
+
+            }
+
+            ++i;
+
+        }
+
+        return *this;
+
+    }
+
     
     MutableArray<String> String::split(String const& separators) const {
 

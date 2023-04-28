@@ -90,7 +90,7 @@ namespace Nucleus {
 
         NODISCARD char& get(size_t index) const override;
 
-        NODISCARD size_t size() const override { return count - 1; }
+        NODISCARD size_t size() const override { return count == 0 ? 0 : count - 1; }
 
         NODISCARD bool contains(const char &element) const override;
 

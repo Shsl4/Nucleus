@@ -354,10 +354,10 @@ namespace Nucleus {
         auto ind = String(4 * indent, ' ');
         
         if(name.isEmpty()) {
-            str += String::format("{}{ \n", ind);
+            str += String::format("{}{\n", ind);
         }
         else {
-            str += String::format("{}\"{}\": { \n", ind, name);
+            str += String::format("{}\"{}\": {\n", ind, name);
         }
 
         auto& map = container->dataMap();
@@ -391,10 +391,10 @@ namespace Nucleus {
         auto ind = String(4 * indent, ' ');
 
         if(name.isEmpty()) {
-            str += String::format("{}[ \n", ind, name);
+            str += String::format("{}[\n", ind, name);
         }
         else {
-            str += String::format("{}\"{}\": [ \n", ind, name);
+            str += String::format("{}\"{}\": [\n", ind, name);
         }   
 
         auto& storage = array->dataArray();
@@ -427,7 +427,7 @@ namespace Nucleus {
     void Json::write(String const& fileName) const {
 
         String str;
-        writeObject(storage.rootContainer(), str, nullptr, 0);
+        writeObject(storage.root(), str, nullptr, 0);
 
         if(File file; file.openForWriting(fileName)) {
             file.write(str.begin().get(), str.size());
@@ -456,7 +456,7 @@ namespace Nucleus {
 
         Json json = {};
 
-        parseObject(data, json.archive().rootContainer());
+        parseObject(data, json.archive().root());
 
         return json;
         

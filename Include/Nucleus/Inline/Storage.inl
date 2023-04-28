@@ -7,7 +7,7 @@ namespace Nucleus {
     template <typename Integral> requires (std::is_integral_v<Integral> && !std::is_same_v<bool, Integral>)
     Integral Value::get() const {
         try {
-            return static_cast<Integral>(value.toInteger());
+            return static_cast<Integral>(value.toFloat64());
         }
         catch (std::exception const&) {
             throw Exceptions::Exception("Deserialization error");

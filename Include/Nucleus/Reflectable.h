@@ -30,6 +30,11 @@ namespace Nucleus {
     };
 
     template<typename T>
+    struct RawType<T* const> {
+        using Type = typename RawType<std::remove_pointer_t<T>>::Type;
+    };
+
+    template<typename T>
     using Raw = typename RawType<T>::Type;
 
     class ReflectionFactory {
@@ -120,9 +125,11 @@ namespace Nucleus {
 
         NODISCARD FORCEINLINE String name() const { return this->className; }
 
+        bool operator==(Class const& other) const { return className == other.className; }
+
     private:
 
-        template<typename T> requires !std::is_pointer_v<T>
+        template<typename T> requires (!std::is_pointer_v<T>)
         static String nameRemovePointer(T const& elem) {
             return Type::name(elem);
         }
@@ -142,12 +149,10 @@ namespace Nucleus {
 
 }
 
-#define REFL_BODY(c)                                                                                                \
-    struct {                                                                                                        \
-        struct Refl {                                                                                               \
-        private:                                                                                                    \
-            inline static struct Init {                                                                             \
-                Init() { Nucleus::ReflectionFactory::registerClass<c>(); }                                          \
-            } __refl_init;                                                                                          \
-        };                                                                                                          \
-    };
+#define REFL_BODY(c)                                                                                            \
+    struct Refl {                                                                                               \
+    private:                                                                                                    \
+        inline static struct Init {                                                                             \
+            Init() { Nucleus::ReflectionFactory::registerClass<c>(); }                                          \
+        } __refl_init;                                                                                          \
+    };                                                                                                          \

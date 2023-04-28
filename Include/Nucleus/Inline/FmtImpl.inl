@@ -62,7 +62,9 @@ namespace Nucleus {
 
         static String format(FloatingPoint elem, String const& params) {
             Int64 dec = 0;
-            params.noThrowToInteger(dec);
+            if (params.contains('.')){
+                params.split('.')[0].noThrowToInteger(dec);
+            }
             return String::fromFloatingPoint(elem, dec);
         }
 

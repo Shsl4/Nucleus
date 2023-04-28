@@ -1,25 +1,6 @@
 #include <Nucleus/Nucleus.h>
-#include <any>
 
 using namespace Nucleus;
-
-class Object {
-
-public:
-
-    void constFunc() const {
-
-        Console::log("constFunc\n");
-
-    }
-
-    void func() {
-
-        Console::log("func\n");
-
-    }
-
-};
 
 class Base {
 
@@ -27,9 +8,7 @@ class Base {
     
 public:
     
-    virtual void hello() {
-        Console::log("Hello\n");
-    }
+    NODISCARD virtual String name() const { return "Base"; }
     
     virtual ~Base() = default;
     
@@ -40,16 +19,16 @@ class Derived : public Base {
     REFL_BODY(Derived)
 
  public:
-    
-    void hello() override {
-        Console::log("Derived!!\n");
-    }
-    
+
+    NODISCARD String name() const override { return "Derived"; }
+
 };
 
 namespace Nucleus {
     
     class MyClass4 {
+
+        REFL_BODY(MyClass4)
 
     public:
         bool operator==(const MyClass4& other) const {
@@ -61,6 +40,8 @@ namespace Nucleus {
     };
 
     class MyClass3 {
+
+        REFL_BODY(MyClass3)
 
     public:
     
@@ -78,6 +59,8 @@ namespace Nucleus {
 
     class MyClass2 {
 
+        REFL_BODY(MyClass2)
+
     public:
 
         bool operator==(const MyClass2& other) const {
@@ -93,6 +76,8 @@ namespace Nucleus {
     };
 
     class MyClass {
+
+        REFL_BODY(MyClass)
 
     public:
 
@@ -221,110 +206,92 @@ namespace Nucleus {
     
 }
 
+void stringTests() {
 
-int main(int argc, const char** argv) {
-    
+    auto fmt = String::format("a: {.2} {x} {b} {}. Hello, {}! {}.", 1.0, 2, 3, 4, "世界", "\\end");
+    auto s = String("I hate C++").replaceOccurrences("hate", "love");
+    auto s2 = String("aaabbbccc").replaceOccurrences("a", "b").replaceOccurrences("b", "c");
+
+    Test::assertEqual(String(), String());
+    Test::assertEqual(String::format("{}, {}", "Hello", "world!"), String("Hello, world!"));
+    Test::assertEqual(String("Hello, world!").removeOccurrences("llo"), String("He, world!"));
+    Test::assertEqual(String("Hello, world!").removeAll(String("l")), String("Heo, word!"));
+    Test::assertEqual(String::format("{}", nullptr), String("nullptr"));
+    Test::assertEqual(String::format("{x}", 10), String("0xa"));
+    Test::assertEqual(String::format("{b}", 10), String("1010"));
+    Test::assertEqual(String::format("{.3}", 13.134167), String("13.134"));
+    Test::assertEqual(String::format("{.5}", 9.9999941146), String("9.99999"));
+    Test::assertEqual(fmt, String("a: 1.00 0x2 11 4. Hello, 世界! \\end."));
+    Test::assertEqual(String("0").toBool(), false);
+    Test::assertEqual(String("true").toBool(), true);
+    Test::assertEqual(String("41.52").toFloat64(), 41.52);
+    Test::assertEqual(String("41416251").toInteger(), i64(41416251));
+    Test::assertEqual(String("Cool String").replaceOccurrences("o", "hello"), String("Chellohellol String"));
+    Test::assertEqual(s, String("I love C++"));
+    s.replaceOccurrences("love", "hate").replaceOccurrences("C++", "Fortran");
+    Test::assertEqual(s, String("I hate Fortran"));
+    Test::assertEqual(s2, String("ccccccccc"));
+    Test::assertEqual(s2.replaceOccurrences("c", ""), String());
+
+}
+
+void rawTests(){
+
+    Test::assertEqual(Type::of<Raw<int**************************************&&>>(), Type::of<int>());
+    Test::assertEqual(Type::of<Raw<String*&&>>(), Type::of<String>());
+    Test::assertEqual(Type::of<Raw<const int* const&>>(), Type::of<const int>());
+    Test::assertEqual(Type::of<Raw<MutableArray<int>*&>>(), Type::of<MutableArray<int>>());
+
+}
+
+void jsonTests() {
+
     MyClass obj;
 
     Json json;
-    
+
     Archive& archive = json.archive();
 
-    Serializer<MyClass>::serialize(archive.rootContainer(), obj);
+    Serializer<MyClass>::serialize(archive.root(), obj);
 
-    MyClass obj2 = Serializer<MyClass>::deserialize(archive.rootContainer());
+    MyClass obj2 = Serializer<MyClass>::deserialize(archive.root());
+
+    Test::assertEqual(obj, obj2);
 
     json.archive().reset();
-    
-    Serializer<MyClass>::serialize(archive.rootContainer(), obj2);
-    
+
+    Serializer<MyClass>::serialize(archive.root(), obj2);
+
     json.write("object.json");
 
     json.archive().reset();
-    
+
     Json j = Json::parse("object.json");
 
-    MyClass obj3 = Serializer<MyClass>::deserialize(j.archive().rootContainer());
-    
-    j.write("object.json");
-    
-    ExceptionHandler::run([&](){
+    MyClass obj3 = Serializer<MyClass>::deserialize(j.archive().root());
 
-        List<int> myList = { 100, 200, 5312, 141, 1510, 1010, 014112, 0x414, 5154 };
-        
-        Bench::run([&](){
+    Test::assertEqual(obj2, obj3);
 
-            Console::log("{0,x}\n{b}\n{0}\n", myList);
+}
 
-        }, 10000);
+void reflectionTest() {
 
-        nthrow("Exception!");
+    Base* obj = static_cast<Base*>(Class::fromName("Derived").unmanaged());
 
-    });
+    auto cl = Class::of(obj);
 
-    File file;
-    file.load(argv[0]);
-    const auto data = file.data();
+    Test::assertEqual(obj->name(), String("Derived"));
 
-    if(file.openForWriting(String(argv[0]) + ".copy")) {
-        file.write(data.begin().get(), data.size());
-    }
+    Test::assertEqual(cl, Class::fromName("Derived"));
 
-    int a = 5;
-    void* b = nullptr;
+}
 
-    Function<void()> f = [&]() -> void {
+int main(int argc, const char** argv) {
 
-        Console::log("Lambda! {} {}\n", a, b);
-
-        // Random stuff to edit the variables' states
-        b = reinterpret_cast<void*>(Random::randomInteger<intptr_t>(0, 0xffffffff));
-        a = Random::randomInteger<int>(0, 50);
-
-    };
-
-    for (size_t i = 0; i < 50; ++i) {
-        f();
-    }
-
-    using Signature = decltype(&Collection<int>::addAll);
-    const Function<void(Object::*)()> classFunc = &Object::constFunc;
-    const Function<Signature> polymorphicFunc = &Collection<int>::addAll;
-    const Function<void(Object*)> lambda = [](auto* obj) {
-
-        Console::log("{}\n", obj);
-
-    };
-
-    Function<void(Object*)> const& constRef = lambda;
-
-    Object object;
-    MutableArray<int> arr;
-    MutableArray objArr = { &object };
-
-    auto x = StaticArray<int, 4>({ 5, 6, 7, 8 });
-    polymorphicFunc(arr, x);
-    classFunc(object);
-    constRef(objArr[0]);
-
-    Console::log("{}\n", arr);
-
-    Derived* de = new Derived();
-    void* p = de;
-    Base* bb = static_cast<Base*>(p);
-    auto r = &*bb;
-    Console::log("{}\n", Type::name(*bb));
-    r->hello();
-
-    Console::log("{}\n", Type::name<Raw<int**************************************&&>>());
-    Console::log("{}\n", Type::name<Raw<decltype(r)>>());
-
-    Base** pp = &bb;
-
-    Class c = Class::of(pp);
-    void* d = c.unmanaged();
-
-    Console::log("{}: {}\n", c.name(), d);
+    stringTests();
+    rawTests();
+    jsonTests();
+    reflectionTest();
     
     return 0;
 

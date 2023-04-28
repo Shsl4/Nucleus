@@ -4,14 +4,14 @@ namespace Nucleus{
     
     Archive::Archive(Archive const& other) {
             
-        if (other.root) {
-            root = Unique(other.rootContainer()->duplicate());
+        if (other.container) {
+            container = Unique(other.root()->duplicate());
         }
             
     }
 
     void Archive::reset() {
-        this->root = Unique<ObjectContainer>::make();
+        this->container = Unique<ObjectContainer>::make();
     }
     
 }
