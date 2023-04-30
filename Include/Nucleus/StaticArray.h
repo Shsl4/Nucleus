@@ -61,9 +61,7 @@ namespace Nucleus {
         NODISCARD size_t size() const override { return sz; }
 
         NODISCARD size_t capacity() const override { return sz; }
-
-        NODISCARD bool isEmpty() const override { return false; }
-
+        
         NODISCARD T &get(size_t index) const override { assert(index < sz); return *(const_cast<T*>(buffer) + index); }
 
         auto add(const T&) -> decltype(*this) & override {
@@ -81,27 +79,9 @@ namespace Nucleus {
         auto insertAll(const Collection<T>&, size_t) -> decltype(*this) & override {
             throw Exceptions::UnsupportedOperation("Unsupported operation insertAll() on StaticArray");
         }
-
-        bool remove(const T&) override { return false; }
-
+        
         bool removeAt(size_t) override { return false; }
-
-        auto removeAll(const Collection<T>&) -> decltype(*this) & override { return *this; }
-
-        bool contains(const T &element) const override {
-
-            for(size_t i = 0; i < sz; ++i){
-
-                if (buffer[i] == element){
-                    return true;
-                }
-
-            }
-
-            return false;
-
-        }
-
+        
         void clear() override { }
 
         typename Super::Iterator begin() const override {

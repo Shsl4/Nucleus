@@ -229,46 +229,6 @@ namespace Nucleus {
     }
 
     template<class T>
-    bool SmartArray<T>::remove(T *const &element) {
-
-        bool r = false;
-
-        for(size_t i = 0; i < size(); ++i){
-
-            if (buffer[i] == element){
-                removeAt(i--);
-                r = true;
-            }
-
-        }
-
-        return r;
-
-    }
-
-    template<class T>
-    auto SmartArray<T>::removeAll(const Collection<T *> &collection) -> decltype(*this) & {
-
-        for(auto const& e : collection){
-            remove(e);
-        }
-
-        return *this;
-
-    }
-
-    template<class T>
-    bool SmartArray<T>::contains(T *const &element) const {
-
-        for (size_t i = 0; i < arraySize; ++i) {
-            if (buffer[i] == element) return true;
-        }
-
-        return false;
-
-    }
-
-    template<class T>
     void SmartArray<T>::clear() {
 
         for (size_t i = 0; i < arraySize; ++i) {
@@ -281,11 +241,7 @@ namespace Nucleus {
         this->arrayCapacity = 0;
 
     }
-
-    template<class T>
-    bool SmartArray<T>::isEmpty() const {
-        return arraySize == 0;
-    }
+    
 
 }
 

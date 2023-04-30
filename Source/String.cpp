@@ -465,46 +465,7 @@ namespace Nucleus{
         return true;
 
     }
-
-    bool String::remove(const char &element) {
-
-        bool r = false;
-
-        for(size_t i = 0; i < size(); ++i){
-
-            if (buffer[i] == element){
-                removeAt(i--);
-                r = true;
-            }
-
-        }
-
-        return r;
-
-    }
-
-
-    auto String::removeAll(const Collection &collection) -> decltype(*this)& {
-
-        for(auto const& e : collection){
-            remove(e);
-        }
-
-        return *this;
-    }
-
-    bool String::contains(const char &element) const {
-
-        for(const auto& c : *this) {
-            if(c == element) return true;
-        }
-
-        return false;
-
-    }
-
-    bool String::isEmpty() const { return count == 0 || buffer[0] == '\0'; }
-
+    
     size_t String::capacity() const { return storage; }
 
     Float64 String::toFloat64() const {

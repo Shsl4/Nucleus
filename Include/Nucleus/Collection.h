@@ -19,13 +19,13 @@ namespace Nucleus {
             
         public:
             
-            virtual pointer operator->() = 0;
+            NODISCARD virtual pointer operator->() = 0;
             
-            virtual pointer get() const = 0;
+            NODISCARD virtual pointer get() const = 0;
             
-            virtual reference operator*() = 0;
+            NODISCARD virtual reference operator*() = 0;
         
-            virtual reference operator++() = 0;
+            NODISCARD virtual reference operator++() = 0;
             
             friend bool operator==(const IteratorBase& a, const IteratorBase& b) {
                 return typeid(a) == typeid(b) && a.equal(b);
@@ -35,7 +35,7 @@ namespace Nucleus {
 
         protected:
         
-            virtual bool equal(const IteratorBase& other) const { return false; }
+            NODISCARD virtual bool equal(const IteratorBase& other) const { return false; }
             
         };
         
@@ -52,25 +52,25 @@ namespace Nucleus {
 
             }
 
-            pointer operator->() override {
+            NODISCARD pointer operator->() override {
                 return ptr;
             }
 
-            pointer get() const override {
+            NODISCARD pointer get() const override {
                 return ptr;
             }
 
-            reference operator*() override {
+            NODISCARD reference operator*() override {
                 return *ptr;
             }
 
-            reference operator++() override {
+            NODISCARD reference operator++() override {
                 return *(++ptr);
             }
 
         protected:
 
-            bool equal(const IteratorBase &other) const override {
+            NODISCARD bool equal(const IteratorBase &other) const override {
                 return static_cast<const ContinuousIterator&>(other).ptr == ptr;
             }
 
@@ -116,9 +116,9 @@ namespace Nucleus {
 
         virtual ~Collection() = default;
 
-        virtual Iterator begin() const = 0;
+        NODISCARD virtual Iterator begin() const = 0;
 
-        virtual Iterator end() const = 0;
+        NODISCARD virtual Iterator end() const = 0;
 
         NODISCARD virtual size_t size() const = 0;
 
@@ -134,21 +134,29 @@ namespace Nucleus {
 
         virtual auto insertAll(Collection const& collection, size_t index) -> decltype(*this)& = 0;
 
-        virtual bool remove(T const& element) = 0;
-
-        virtual bool removeAt(size_t index) = 0;
-
-        virtual auto removeAll(Collection const& collection) -> decltype(*this)& = 0;
-
-        virtual bool contains(T const& element) const = 0;
-
         virtual void clear() = 0;
+        
+        virtual bool removeAt(size_t index) = 0;
+        
+        bool removeFirst(T const& element);
 
-        NODISCARD virtual bool isEmpty() const = 0;
+        bool removeLast(T const& element);
+
+        auto remove(Collection const& collection) -> decltype(*this)&;
+
+        auto removeAll(T const& element) -> decltype(*this)&;
+        
+        NODISCARD bool contains(T const& element) const;
+        
+        NODISCARD bool isEmpty() const { return size() == 0; }
+        
+        NODISCARD T& operator[](size_t index) const;
+
+        NODISCARD T& first() const { return get(0); }
+
+        NODISCARD T& last() const { return get(size() - 1); }
 
         void randomize();
-
-        T& operator[](size_t index) const;
 
         template<typename CollectionType> requires (std::is_base_of_v<Collection, CollectionType>)
         friend auto operator+(CollectionType& collection, T const& element) -> CollectionType {
@@ -163,7 +171,7 @@ namespace Nucleus {
         friend auto operator-(CollectionType& collection, T const& element) -> CollectionType {
 
             CollectionType copy = collection;
-            copy.remove(element);
+            copy.removeFirst(element);
             return copy;
 
         }
@@ -175,7 +183,7 @@ namespace Nucleus {
 
         template<typename CollectionType> requires (std::is_base_of_v<Collection, CollectionType>)
         friend auto operator-=(CollectionType& collection, T const& element) -> CollectionType& {
-            collection.remove(element);
+            collection.removeFirst(element);
             return collection;
         }
 
@@ -186,7 +194,7 @@ namespace Nucleus {
 
         template<typename CollectionType> requires (std::is_base_of_v<Collection, CollectionType>)
         friend auto operator-=(CollectionType& collection, Collection const& other) -> CollectionType& {
-            return collection.removeAll(other);
+            return collection.remove(other);
         }
 
         template<typename CollectionType> requires (std::is_base_of_v<Collection, CollectionType>)
@@ -204,7 +212,7 @@ namespace Nucleus {
         friend auto operator-=(CollectionType& collection, std::initializer_list<T> const& list) -> CollectionType& {
 
             for (T const& element : list) {
-                collection.remove(element);
+                collection.removeFirst(element);
             }
 
             return collection;
@@ -232,4 +240,4 @@ namespace Nucleus {
 
 #define COLLECTION_INLINE
 #include <Nucleus/Inline/Collection.inl>
-#undef COLLECTION_INLINE
+#undef COLLECTION_INLIN

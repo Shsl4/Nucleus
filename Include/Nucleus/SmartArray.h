@@ -45,17 +45,9 @@ namespace Nucleus {
         auto insertAll(const Collection<T *> &array, size_t index) -> decltype(*this) & override;
 
         bool removeAt(size_t index) override;
-
-        auto removeAll(const Collection<T *> &collection) -> decltype(*this) & override;
-
-        bool remove(T *const &element) override;
-
-        bool contains(T *const &element) const override;
-
+        
         void clear() override;
-
-        NODISCARD bool isEmpty() const override;
-
+    
     private:
 
         void extend(size_t size);

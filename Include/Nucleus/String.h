@@ -55,11 +55,7 @@ namespace Nucleus {
         auto insertAll(const Collection &collection, size_t index) -> decltype(*this) & override;
 
         bool removeAt(size_t index) override;
-
-        bool remove(const char &element) override;
-
-        auto removeAll(const Collection<char> &collection) -> decltype(*this) & override;
-
+        
         String& addMem(const char* mem, size_t size);
 
         String& insertAll(const char* string, size_t index);
@@ -91,10 +87,6 @@ namespace Nucleus {
         NODISCARD char& get(size_t index) const override;
 
         NODISCARD size_t size() const override { return count == 0 ? 0 : count - 1; }
-
-        NODISCARD bool contains(const char &element) const override;
-
-        NODISCARD bool isEmpty() const override;
 
         NODISCARD MutableArray<String> split(String const& separators) const;
 

@@ -48,19 +48,11 @@ namespace Nucleus {
         auto insertAll(const Collection<T> &collection, size_t index) -> decltype(*this)& override;
 
         bool removeAt(size_t index) override;
-
-        bool remove(const T &element) override;
-
-        auto removeAll(const Collection<T> &collection) -> decltype(*this)& override;
-
-        bool contains(const T &element) const override;
-
+        
         void clear() override;
 
         auto intersect(Collection<T> const& other) -> MutableArray;
-
-        NODISCARD bool isEmpty() const override;
-
+        
         NODISCARD T* data() const { return this->buffer; }
 
         MutableArray& operator=(MutableArray const& other);

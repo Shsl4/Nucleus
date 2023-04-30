@@ -206,6 +206,12 @@ namespace Nucleus {
     
 }
 
+void mutableArrayTests() {
+
+    // TODO: write tests
+    
+}
+
 void stringTests() {
 
     auto fmt = String::format("a: {.2} {x} {b} {}. Hello, {}! {}.", 1.0, 2, 3, 4, "世界", "\\end");
@@ -215,7 +221,7 @@ void stringTests() {
     Test::assertEqual(String(), String());
     Test::assertEqual(String::format("{}, {}", "Hello", "world!"), String("Hello, world!"));
     Test::assertEqual(String("Hello, world!").removeOccurrences("llo"), String("He, world!"));
-    Test::assertEqual(String("Hello, world!").removeAll(String("l")), String("Heo, word!"));
+    Test::assertEqual(String("Hello, world!").removeAll('l'), String("Heo, word!"));
     Test::assertEqual(String::format("{}", nullptr), String("nullptr"));
     Test::assertEqual(String::format("{x}", 10), String("0xa"));
     Test::assertEqual(String::format("{b}", 10), String("1010"));
@@ -228,6 +234,7 @@ void stringTests() {
     Test::assertEqual(String("41416251").toInteger(), i64(41416251));
     Test::assertEqual(String("Cool String").replaceOccurrences("o", "hello"), String("Chellohellol String"));
     Test::assertEqual(s, String("I love C++"));
+    
     s.replaceOccurrences("love", "hate").replaceOccurrences("C++", "Fortran");
     Test::assertEqual(s, String("I hate Fortran"));
     Test::assertEqual(s2, String("ccccccccc"));
@@ -288,10 +295,13 @@ void reflectionTest() {
 
 int main(int argc, const char** argv) {
 
+    mutableArrayTests();
     stringTests();
     rawTests();
     jsonTests();
     reflectionTest();
+    
+    Console::log("Hello\n");
     
     return 0;
 

@@ -27,8 +27,8 @@ namespace Nucleus{
 
         }
 
-        template<typename T>
-        static void assertEqual(const T &a, const T &b) {
+        template<typename T, typename Y>
+        static void assertEqual(const T &a, const Y &b) {
 
             if (a != b){
                 throw Exceptions::Exception("Test failed! Values are not equal!");

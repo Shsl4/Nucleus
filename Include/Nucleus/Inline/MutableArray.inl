@@ -81,11 +81,6 @@ namespace Nucleus {
     }
 
     template<class T>
-    bool MutableArray<T>::isEmpty() const {
-        return bufferSize == 0;
-    }
-
-    template<class T>
     void MutableArray<T>::clear() {
 
         Allocator<T>::release(buffer);
@@ -94,36 +89,7 @@ namespace Nucleus {
         this->bufferCapacity = 0;
 
     }
-
-    template<class T>
-    bool MutableArray<T>::contains(const T &element) const {
-
-        for (size_t i = 0; i < bufferSize; ++i) {
-            if (buffer[i] == element) return true;
-        }
-
-        return false;
-
-    }
-
-    template<class T>
-    bool MutableArray<T>::remove(const T &element) {
-
-        bool r = false;
-
-        for(size_t i = 0; i < size(); ++i){
-
-            if (element == buffer[i]){
-                removeAt(i--);
-                r = true;
-            }
-
-        }
-
-        return r;
-
-    }
-
+    
     template<class T>
     bool MutableArray<T>::removeAt(size_t index) {
 
@@ -239,9 +205,7 @@ namespace Nucleus {
         }
 
     }
-
-
-
+    
     template<class T>
     MutableArray<T>::MutableArray(std::vector<T> vector) {
 
@@ -255,16 +219,6 @@ namespace Nucleus {
             buffer[i++] = element;
         }
 
-    }
-
-    template<class T>
-    auto MutableArray<T>::removeAll(const Collection<T> &collection) -> decltype(*this) & {
-
-        for(auto const& e : collection){
-            remove(e);
-        }
-
-        return *this;
     }
 
     template<class T>

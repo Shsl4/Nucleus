@@ -90,7 +90,7 @@ namespace Nucleus {
         }
 
         NODISCARD typename Collection<T>::Iterator end() const override {
-            return typename Collection<T>::Iterator(Allocator<NodeIterator>::construct(last()));
+            return typename Collection<T>::Iterator(Allocator<NodeIterator>::construct(lastNode()));
         }
 
         NODISCARD size_t size() const override {
@@ -122,7 +122,7 @@ namespace Nucleus {
             
             if(!root){ root = Node::make(element); return *this; }
 
-            last()->next = Node::make(element);
+            lastNode()->next = Node::make(element);
             
             return *this;
 
@@ -183,38 +183,6 @@ namespace Nucleus {
             
         }
 
-        bool remove(const T &element) override {
-            
-            Node* node = root;
-            Node* prev = nullptr;
-
-            while (node) {
-                
-                if(node->value == element){
-                    
-                    if (node == root) {
-                        root = node->next;
-                    }
-                    else{
-                        prev->next = node->next;
-                    }
-                    
-                    node->next = nullptr;
-                    Allocator<Node>::destroy(node);
-                    --cachedSize;
-                    return true;
-                    
-                }
-                
-                prev = node;
-                node = node->next;
-                
-            }
-            
-            return false;
-            
-        }
-
         bool removeAt(size_t index) override {
 
             if(!root) return false;
@@ -251,41 +219,12 @@ namespace Nucleus {
 
             return false;
         }
-
-        auto removeAll(const Collection<T> &collection) -> decltype(*this) & override {
-
-            for (auto& e : collection) {
-                remove(e);
-            }
-
-            return *this;
-
-        }
-
-        NODISCARD bool contains(const T &element) const override {
-
-            Node* node = root;
-
-            while(node){
-
-                if (node->value == element) return true;
-                node = node->next;
-
-            }
-
-            return false;
-
-        }
-
+        
         void clear() override {
 
         }
 
-        NODISCARD bool isEmpty() const override {
-            return !root;
-        }
-
-        NODISCARD Node* last() const{
+        NODISCARD Node* lastNode() const{
 
             Node* node = root;
 
