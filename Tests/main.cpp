@@ -295,14 +295,16 @@ void reflectionTest() {
 
 int main(int argc, const char** argv) {
 
-    mutableArrayTests();
-    stringTests();
-    rawTests();
-    jsonTests();
-    reflectionTest();
-    
-    Console::log("Hello\n");
-    
+    ExceptionHandler::run([] {
+
+        mutableArrayTests();
+        stringTests();
+        rawTests();
+        jsonTests();
+        reflectionTest();
+
+    });
+
     return 0;
 
 }

@@ -65,7 +65,7 @@ namespace Nucleus {
         String& replaceOccurrences(String const& of, String const& with); 
 
         void clear() override;
-        
+
         template<typename... Args>
         static String format(String const& fmt, Args&&... args);
         
@@ -88,6 +88,8 @@ namespace Nucleus {
 
         NODISCARD size_t size() const override { return count == 0 ? 0 : count - 1; }
 
+        NODISCARD const char *cString() const noexcept { return this->buffer; }
+
         NODISCARD MutableArray<String> split(String const& separators) const;
 
         NODISCARD MutableArray<String> split(char separator) const;
@@ -107,19 +109,14 @@ namespace Nucleus {
         NODISCARD bool toBool() const;
 
         NODISCARD String toLower() const;
-        
-        bool noThrowToInteger(Int64& out) const noexcept;
-        
+
         NODISCARD Int64 toInteger() const;
 
-        NODISCARD static bool isInteger(const char c) {
-            return c >= L'0' && c <= L'9';
-        }
+        NODISCARD static bool isInteger(const char c) { return c >= L'0' && c <= L'9'; }
 
-        NODISCARD static UInt16 charToInteger(const char c) {
-            return c - '0';
-        }
+        NODISCARD static UInt16 charToInteger(const char c) { return c - '0'; }
 
+        bool noThrowToInteger(Int64& out) const noexcept;
 
     private:
 

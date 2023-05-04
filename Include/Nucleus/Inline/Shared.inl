@@ -56,7 +56,7 @@ namespace Nucleus {
 
         if(&other == this) return *this;
 
-        if(other.isValid()) {
+        if(other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -73,7 +73,7 @@ namespace Nucleus {
 
         if(&other == this) return *this;
 
-        if(other.isValid()) {
+        if(other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -96,7 +96,7 @@ namespace Nucleus {
 
         static_assert(std::is_base_of_v<T, Y>, "Y must inherit T");
             
-        if (other.isValid()) {
+        if (other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -114,7 +114,7 @@ namespace Nucleus {
 
         static_assert(std::is_base_of_v<T, Y>, "Y must inherit T");
             
-        if (other.isValid()) {
+        if (other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -162,7 +162,7 @@ namespace Nucleus {
     }
     
     template <typename T>
-    Weak<T> Shared<T>::makeWeak() const {
+    Weak<T> Shared<T>::weak() const {
         
         if(!counter) return Weak<T>();
 
@@ -178,13 +178,13 @@ namespace Nucleus {
 
     template<typename T>
     Shared<T>::operator bool() const {
-        return isValid();
+        return valid();
     }
 
     template<typename T>
     template<typename Y>
     bool Shared<T>::operator==(const Y &other) const noexcept {
-        if(!isValid()) return false;
+        if(!valid()) return false;
         return *object == other;
     }
 
@@ -225,7 +225,7 @@ namespace Nucleus {
             
         if(&other == this) return *this;
 
-        if(other.isValid()) {
+        if(other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -242,7 +242,7 @@ namespace Nucleus {
             
         if(&other == this) return *this;
 
-        if(other.isValid()) {
+        if(other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -280,7 +280,7 @@ namespace Nucleus {
 
         static_assert(std::is_base_of_v<T, Y>, "Y must inherit T");
             
-        if (other.isValid()) {
+        if (other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -298,7 +298,7 @@ namespace Nucleus {
 
         static_assert(std::is_base_of_v<T, Y>, "Y must inherit T");
             
-        if (other.isValid()) {
+        if (other.valid()) {
 
             this->counter = other.counter;
             this->object = other.object;
@@ -313,14 +313,12 @@ namespace Nucleus {
     }
 
     template<typename T>
-    Weak<T>::operator bool() const {
-        return isValid();
-    }
+    Weak<T>::operator bool() const { return valid(); }
 
     template<typename T>
     template<typename Y>
     bool Weak<T>::operator==(const Y &other) const noexcept {
-        if(!isValid()) return false;
+        if(!valid()) return false;
         return *object == other;
     }
 

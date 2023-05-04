@@ -71,7 +71,7 @@ namespace Nucleus {
         template<typename Y>
         bool operator==(Y const& other) const noexcept;
 
-        operator bool() const;
+        NODISCARD operator bool() const;
 
         template<typename Y>
         Shared& operator=(Shared<Y> const& other) noexcept;
@@ -91,9 +91,9 @@ namespace Nucleus {
                 
         FORCEINLINE T* pointer() const { assert(object); return object; }
         
-        NODISCARD FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
+        NODISCARD FORCEINLINE bool valid() const noexcept { return counter != nullptr && counter->valid(); }
 
-        Weak<T> makeWeak() const;
+        Weak<T> weak() const;
 
     private:
         
@@ -145,7 +145,7 @@ namespace Nucleus {
         template<typename Y>
         bool operator==(Weak<Y> const& other) const noexcept;
 
-        operator bool() const;
+        NODISCARD operator bool() const;
         
         FORCEINLINE T& operator*() { assert(object); return *object; }
         
@@ -159,7 +159,7 @@ namespace Nucleus {
                 
         FORCEINLINE T* pointer() const { assert(object); return object; }
 
-        NODISCARD FORCEINLINE bool isValid() const noexcept { return counter != nullptr && counter->valid(); }
+        NODISCARD FORCEINLINE bool valid() const noexcept { return counter != nullptr && counter->valid(); }
 
     private:
         

@@ -136,7 +136,7 @@ namespace Nucleus {
     public:
 
         static String format(Shared<T> const& elem, String const& params) {
-            return elem.isValid() ? Fmt<T>::format(*elem, params) : "empty";
+            return elem.valid() ? Fmt<T>::format(*elem, params) : "empty";
         }
 
     };
@@ -147,7 +147,7 @@ namespace Nucleus {
     public:
 
         static String format(Weak<T> const& elem, String const& params) {
-            return elem.isValid() ? Fmt<T>::format(*elem, params) : "empty";
+            return elem.valid() ? Fmt<T>::format(*elem, params) : "empty";
         }
 
     };

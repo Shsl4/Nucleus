@@ -32,3 +32,4 @@
 
 #include <Nucleus/Console.h>
 #include <Nucleus/Test.h>
+#include <Nucleus/Singleton.h>
