@@ -30,12 +30,7 @@ namespace Nucleus {
 
         template<typename NumberType>
         FORCEINLINE static NumberType clampAround(NumberType a, NumberType min, NumberType max) {
-
-            if (a < min) { return max - std::fabs(fmod(a, max)); }
-            if (a > max) { return min + std::fabs(fmod(a, max)); }
-
-            return a;
-
+            return a < min ? max - std::fabs(fmod(a - min, max)) : (a > max ? min + std::fabs(fmod(a, max)) : a);
         }
 
         template<typename NumberType>

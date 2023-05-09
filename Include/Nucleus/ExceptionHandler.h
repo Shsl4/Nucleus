@@ -9,19 +9,16 @@ namespace Nucleus{
 
     public:
 
-        static void run(const Function<void()> f){
+        static void run(Function<void()> const& f){
 
             try {
                 f();
             }
-            catch(std::exception const& e) {
+            catch(Exceptions::Exception& e) {
 
                 Console::error("Unhandled error: {}\n", e.what());
-                
-                if(const auto* ex = dynamic_cast<const Exceptions::Exception*>(&e)) {
-                    Console::error("Printing Stack Trace:\n{}\n", ex->formattedTrace());
-                }
-                
+                Console::error("Printing Stack Trace:\n{}\n", e.formattedTrace());
+
             }
 
         }
