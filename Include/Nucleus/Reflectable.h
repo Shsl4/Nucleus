@@ -96,8 +96,6 @@ namespace Nucleus {
         template<class T>
         static Class of(T const& object) {
 
-            using ClassType = std::remove_pointer_t<T>;
-            
             nthrowif(!ReflectionFactory::isReflected(nameRemovePointer(object)), "The target class is not reflected!");
             return Class(nameRemovePointer(object));
         
@@ -138,7 +136,7 @@ namespace Nucleus {
         static String nameRemovePointer(T const& elem) {
             return elem ? nameRemovePointer(*elem) : Type::name<Raw<T>>();
         }
-        
+
         explicit Class(String name) : className(std::move(name)) {
         
         }

@@ -5,11 +5,18 @@
 
 namespace Nucleus {
 
+    /*!
+     * An abstract interface for containers (Arrays, Sets, Lists...)
+     * @tparam T The data type to store
+     */
     template<class T>
     class Collection {
 
     public:
-        
+
+        /*!
+         * A simple iterator interface to implement by collections.
+         */
         class IteratorBase {
         
             using difference_type   = std::ptrdiff_t;
@@ -38,7 +45,10 @@ namespace Nucleus {
             NODISCARD virtual bool equal(const IteratorBase& other) const { return false; }
             
         };
-        
+
+        /*!
+         * A basic iterator working for collection with continuous memory storage.
+         */
         class ContinuousIterator : public IteratorBase {
 
             using difference_type   = std::ptrdiff_t;
@@ -80,6 +90,9 @@ namespace Nucleus {
 
         };
 
+        /*!
+         * An iterator wrapper for @see IteratorBase types.
+         */
         class Iterator {
 
         public:
@@ -240,4 +253,4 @@ namespace Nucleus {
 
 #define COLLECTION_INLINE
 #include <Nucleus/Inline/Collection.inl>
-#undef COLLECTION_INLIN
+#undef COLLECTION_INLINE

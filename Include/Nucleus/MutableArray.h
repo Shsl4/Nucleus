@@ -5,7 +5,7 @@
 namespace Nucleus {
 
     template<class T>
-    class MutableArray : public Collection<T>{
+    class MutableArray : public Collection<T> {
 
         using Super = Collection<T>;
 

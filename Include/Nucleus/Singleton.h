@@ -31,3 +31,30 @@ public:                                                                         
     }                                                                               \
                                                                                     \
     private:
+
+#define SINGLETON_BODY_NO_CTOR(__class)                                             \
+                                                                                    \
+private:                                                                            \
+                                                                                    \
+    friend Nucleus::Allocator<__class>;                                             \
+                                                                                    \
+    static inline Nucleus::Shared<__class> instance_ = nullptr;                     \
+    static inline std::mutex mutex_ = {};                                           \
+                                                                                    \
+public:                                                                             \
+                                                                                    \
+    __class(__class &other) = delete;                                               \
+                                                                                    \
+    void operator=(const __class&) = delete;                                        \
+                                                                                    \
+    static __class* instance(){                                                     \
+                                                                                    \
+        std::lock_guard<std::mutex> lock(mutex_);                                   \
+                                                                                    \
+        if (!instance_.valid()) { instance_ = Nucleus::Shared<__class>::make(); }   \
+                                                                                    \
+        return instance_.pointer();                                                 \
+                                                                                    \
+    }                                                                               \
+                                                                                    \
+    private:

@@ -39,7 +39,13 @@ namespace Nucleus {
     using UInt32 = uint32_t;
     using UInt64 = uint64_t;
 
+    /*!
+     * Throws an exception of type @see{Exceptions::Exception}. Allows the library to throw
+     * without having to include the Exceptions header which might cause circular dependency
+     * @param message The error message
+     */
     NORETURN void throwException(const char* message);
+
 }
 
 #define f32(x) static_cast<Nucleus::Float32>(x)

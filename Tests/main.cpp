@@ -303,6 +303,14 @@ int main(int argc, const char** argv) {
         jsonTests();
         reflectionTest();
 
+        Bench::run([]() {
+            String::format("{}{x}{b}", 1, 2, 3);
+        }, 50000);
+
+        MutableArray<int> ok = { 5, 6, 7, 8 };
+
+        Console::log("{}", ok);
+
     });
 
     return 0;

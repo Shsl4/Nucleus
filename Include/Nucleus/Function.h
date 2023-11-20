@@ -41,7 +41,7 @@ namespace Nucleus {
 
         }
 
-        ReturnType operator()(Args... args) const {
+        FORCEINLINE ReturnType operator()(Args... args) const {
             return callable.pointer()->operator()(std::forward<Args>(args)...);
         }
 
@@ -51,7 +51,7 @@ namespace Nucleus {
 
             virtual ~Base() = default;
 
-            virtual ReturnType operator()(Args&&... args) { nthrow("Illegal state"); }
+            FORCEINLINE virtual ReturnType operator()(Args&&... args) { nthrow("Illegal state"); }
 
         };
 
@@ -62,9 +62,7 @@ namespace Nucleus {
 
             explicit Derived(T const& value) : value(value) {}
 
-            ReturnType operator()(Args&&... args) override {
-                return value(std::forward<Args>(args)...);
-            }
+            FORCEINLINE ReturnType operator()(Args&&... args) override { return value(std::forward<Args>(args)...); }
 
             T value;
 
